@@ -1,0 +1,112 @@
+.slidecontainer_wrapper {
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+}
+
+.slidecontainer_description {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.slidecontainer_description_label {
+    display: flex;
+    align-items: center;
+    transition: .12s ease-in-out;
+    line-height: 20px;
+    cursor: pointer;
+    font-size: 12px;
+    margin-bottom: 5px;
+}
+
+.slidecontainer_description_info {
+    background-color: transparent;
+    color: #f7f8f8;
+    z-index: 999;
+    max-width: 240px;
+    font-size: 13px;
+    line-height: 140%;
+}
+
+.slidecontainer_description_label_tooltip {
+    background-color: transparent;
+    background: var(--input-background-color);
+    border: 1px solid var(--input-border-color);
+    padding: 9px 12px;
+}
+
+.slidecontainer_description_label_tooltip_btn {
+    margin-left: 5px;
+}
+
+.slidecontainer_description_label_icon {
+    height: 16px;
+    width: 16px;
+    color: white;
+    stroke: white;
+    position: relative;
+}
+
+.slidecontainer_description_value {
+    background-color: var(--input-background-color);
+    width: fit-content;
+    padding-left: 5px;
+    padding-right: 5px;
+    display: flex;
+    font-size: var(--font-regular);
+    justify-content: center;
+    justify-items: center;
+    align-items: center;
+    align-content: center;
+    border-radius: 5px;
+}
+
+.slidecontainer {
+    width: 100%;
+  }
+  
+  .slider {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    background: var(--underline-controls-menu-color);
+    border-radius: 5px;
+    outline: none;
+    /* transition: opacity 0.5s; */
+    /* border: 2px solid red; */
+  }
+
+  .slider {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: var(--slider-height, 10px);
+    border-radius: var(--slider-radius, 5px);
+    background: linear-gradient(
+      to right,
+      white 0%,
+      white calc(var(--slider-progress, 50%) * 1%),
+      var(--underline-controls-menu-color) calc(var(--slider-progress, 50%) * 1%),
+      var(--underline-controls-menu-color) 100%
+    );
+    outline: none;
+  }
+  
+  .slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: var(--thumb-width, 25px);
+    height: var(--thumb-height, 25px);
+    border-radius: var(--thumb-radius, 50%);
+    background: linear-gradient(90deg, var(--text-new-gradient-start) 0%, var(--text-new-gradient-end) 100%);
+    cursor: pointer;
+  }
+  
+  .slider::-moz-range-thumb {
+    width: var(--thumb-width, 25px);
+    height: var(--thumb-height, 25px);
+    border-radius: var(--thumb-radius, 50%);
+    background: linear-gradient(90deg, var(--text-new-gradient-start) 0%, var(--text-new-gradient-end) 100%);
+    cursor: pointer;
+  }

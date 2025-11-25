@@ -1,0 +1,28 @@
+.gallery {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  max-width: 574px;
+  margin-left: auto;
+}
+
+.image {
+  width: calc(33.33% - 9.33px);
+}
+
+@media (max-width: 1200px) {
+  .gallery {
+    margin: 0;
+  }
+}
+
+@media (max-width: 767px) {
+  .gallery {
+    gap: 8px;
+  }
+
+  .image {
+    width: calc(33.33% - 5.33px);
+    height: auto;
+  }
+}

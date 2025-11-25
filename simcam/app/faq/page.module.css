@@ -1,0 +1,38 @@
+.page_wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    margin-top: 4rem;
+    /* border: 2px solid white; */
+}
+
+.pageWrapper {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    width: 100%;
+    max-width: 1110px;
+    padding: 0 16px;
+    /* width: 100%; */
+    /* margin: 0 auto; */
+    /* border: 2px solid red; */
+}
+
+.website_faq_email {
+    font-size: var(--font-regular-medium);
+    font-weight: var(--font-weight-regular-enlarged);
+    margin-top: 24px;
+    text-align: center;
+    align-content: center;
+    height: 75px;
+    background-color: var(--color-gray);
+    /* background: #1f202350; */
+    border-radius: 10px;
+    color: #ECEDEE;
+}
+
+.website_faq_span {
+    color: #ECEDEE70; 
+    font-weight: 500;
+}

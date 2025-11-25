@@ -1,0 +1,137 @@
+.slider {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-bottom: 92px;
+  margin-bottom: 32px;
+  position: relative;
+}
+
+.slider:before {
+  content: "";
+  display: block;
+  position: absolute;
+  left: 0;
+  top: -150px;
+  width: 240px;
+  height: 240px;
+  border-radius: 100%;
+  background: #c0a1ff;
+  filter: blur(200px);
+}
+
+.step {
+  position: relative;
+  margin-bottom: 60px;
+  background: linear-gradient(193deg, #f0b867 0%, #c2c368 100%);
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-weight: 600;
+  font-size: 20px;
+  line-height: 140%;
+  text-align: center;
+  color: #000;
+  border-radius: 50%;
+}
+
+.h2 {
+  font-weight: 700;
+  font-size: 40px;
+  line-height: 130%;
+  text-align: center;
+  color: #ffffff;
+  margin-bottom: 8px;
+  max-width: 733px;
+  margin-bottom: 130px;
+}
+
+.swiper {
+  width: 100%;
+  position: relative;
+}
+
+.gallery {
+  display: flex;
+  justify-content: space-between;
+  width: calc(100% + 60px);
+  position: relative;
+  flex-shrink: 0;
+}
+
+.image {
+  width: calc(20% - 15px);
+  height: auto;
+}
+
+.image:nth-child(1) {
+  transform: rotate(4deg);
+}
+
+.image:nth-child(2) {
+  transform: rotate(2deg) translateY(17px);
+}
+
+.image:nth-child(3) {
+  transform: translateY(24px);
+}
+
+.image:nth-child(4) {
+  transform: rotate(-2deg) translateY(17px);
+}
+
+.image:nth-child(5) {
+  transform: rotate(-4deg);
+}
+
+@media (max-width: 1024px) {
+  .h2 {
+    margin-bottom: 60px;
+    font-size: 32px;
+  }
+}
+
+@media (max-width: 767px) {
+  .image {
+    width: 100%;
+    height: auto;
+    transform: none;
+  }
+
+  .swiper {
+    padding: 15px 0 !important;
+  }
+
+  .slider_item {
+    transition: 0.2s ease-out;
+  }
+
+  .image:nth-child(1),
+  .image:nth-child(2),
+  .image:nth-child(3),
+  .image:nth-child(4),
+  .image:nth-child(5) {
+    transform: rotate(0);
+  }
+
+  .slider :global(.swiper-slide-prev) {
+    transform: rotate(4deg) translateY(0) !important;
+  }
+
+  .slider :global(.swiper-slide-active) {
+    transform: rotate(0) translateY(13px) !important;
+  }
+
+  .slider :global(.swiper-slide-next) {
+    transform: rotate(-4deg) translateY(0) !important;
+  }
+
+  .slider:before {
+    width: 120px;
+    height: 120px;
+    top: 0;
+  }
+}

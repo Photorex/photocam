@@ -1,0 +1,5 @@
+<svg viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="8" cy="8" r="6" stroke="currentColor"/>
+    <circle cx="8.00002" cy="11.9998" r="0.333333" fill="currentColor" stroke="currentColor"/>
+    <path d="M8 10.6665V9.7206C8 9.0911 8.40281 8.53223 9 8.33317V8.33317C9.59719 8.13411 10 7.57524 10 6.94574V6.60363C10 5.53379 9.13272 4.6665 8.06287 4.6665H8C6.89543 4.6665 6 5.56193 6 6.6665V6.6665" stroke="currentColor"/>
+</svg>

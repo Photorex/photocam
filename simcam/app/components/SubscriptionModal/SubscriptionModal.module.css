@@ -1,0 +1,233 @@
+.pricing__modal {
+    position: relative; /* Adjusted to relative for the modal container */
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* border: 2px solid red; */
+    /* z-index: 9999; */
+}
+
+.modal_pricing {
+    /* margin-top: 100px; */
+    width: 420px; /* Default width for larger screens */
+    /* background: #2b2d30; */
+    background: #121317;
+    border-radius: 6px;
+    box-shadow: 0 12px 24px 0 rgba(62, 64, 83, .12), 0 3px 9px 0 rgba(0, 0, 0, .03);
+    min-height: 40% !important;
+    max-height: 80% !important;
+    overflow: scroll !important;
+    /* border: 2px solid greenyellow !important; */
+}
+
+@media only screen and (max-width: 800px) {
+    .modal_pricing {
+        position: fixed;
+        top: 5%;
+        /* margin-top: -100px; */
+        /* margin-top: calc(100vw - 100px); */
+        min-width: 90% !important;
+        min-height: 30% !important;
+    }
+}
+
+.modal_sm_pricing {
+    /* margin-top: 1500px; */
+    width: calc(100vw - 300px);
+    min-height: calc(100vh - 150px);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #303236;
+    /* border: 2px solid red; */
+}
+
+@media only screen and (max-width: 800px) {
+    .modal_sm_pricing {
+        width: 90% !important;
+    }
+}
+
+.modal_pricing_content {
+    padding: 12px 18px;
+    overflow: hidden;
+    scrollbar-width: none;
+    /* border: 2px solid beige; */
+    height: 100%;
+}
+
+@media only screen and (max-width: 800px) {
+    .modal_pricing_content {
+        padding: 12px 9px;
+    }
+}
+
+.modal_pricing_content__inner {
+    display: flex;
+    flex-grow: 1;
+    flex-direction: column;
+    padding: 20px 12px;
+    /* border: 2px solid red; */
+    height: 100%;
+}
+
+.modal_pricing_content__inner_crypto {
+    display: flex;
+    flex-grow: 1;
+    flex-direction: column;
+    /* padding: 20px 12px; */
+    /* border: 2px solid blue; */
+    height: 100%;
+    overflow-y: scroll;
+}
+
+.modal_pricing_content__inner_crypto::-webkit-scrollbar {
+    width: 6px;
+}
+  
+.modal_pricing_content__inner_crypto::-webkit-scrollbar-track {
+    background: transparent;    
+}
+  
+.modal_pricing_content__inner_crypto::-webkit-scrollbar-thumb {
+    background-color: #888;  
+    border-radius: 20px;     
+}
+
+/* Scrollbar thumb and track colors for Firefox */
+.modal_pricing_content__inner_crypto::-moz-scrollbar-thumb {
+    background-color: #888;
+    border-radius: 20px;
+}
+
+.modal_pricing_content__inner_crypto::-moz-scrollbar-track {
+    background: transparent;
+}
+
+.modal_pricing_content__inner_loading {
+    display: flex;
+    flex-grow: 1;
+    padding: 20px 12px;
+    /* border: 2px solid blue; */
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    gap: 10px;
+}
+
+
+.modal_pricing_socials_list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    /* border: 2px solid red; */
+}
+
+.modal_pricing_p {
+    font-size: 24px !important;
+    font-weight: 500;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+}
+
+.modal_pricing_price {
+    font-weight: 900;
+    font-size: 24px;
+}
+
+.modal_pricing_socials_list li {
+    color: hsla(180, 7%, 97%, .76);
+}
+
+.modal_pricing_socials_list li:hover {
+    color: #fff;
+}
+
+.checkbox-advanced {
+    /* margin: 19px 0 0; */
+}
+
+.checkbox__checkbox {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+.modal_pricing_error {
+    font-size: 14px;
+    font-weight: 500;
+    color: #EB5757;
+    margin-bottom: 5px;
+    padding: 5px;
+}
+
+.paymentGrid {
+    margin-top: 20px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 10px;
+    justify-items: center;
+    /* max-height: 1000px;
+    overflow-y: scroll; */
+}
+
+
+.paymentGridCrypto {
+    margin-top: 20px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 10px;
+    justify-items: center;
+}
+
+@media only screen and (max-width: 800px) {
+    .paymentGridCrypto {
+        max-height: 450px;
+        /* overflow-y: scroll; */
+    }
+}
+
+.payment_button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    /* width: 150px;
+    height: 150px; */
+    width: 100%;
+    height: fit-content;
+    /* height: 100%; */
+    padding: 10px;
+    background-color: #cfcfcf32;
+    border-radius: 10px;
+    /* border: 2px solid red; */
+}
+
+.payment_button_text {
+    font-size: 20px;
+    text-align: center;
+}
+
+.paymentLogo {
+    height: 60px;
+    width: 60px;
+    margin-bottom: 10px;
+    /* border: 2px solid red; */
+}
+
+.paymentLogoCrypto {
+    height: 60px;
+    display: block;
+    margin-bottom: 10px;
+}
+
+/* 
+.paymentLogo:hover {
+    background-color: #cfcfcf88;
+    box-shadow: 0 2px 4px 0 #cfcfcf88, 0 2px 4px 0 #cfcfcf6f;
+
+} */

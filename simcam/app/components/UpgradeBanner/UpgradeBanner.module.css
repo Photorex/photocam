@@ -1,0 +1,61 @@
+/* components/UpgradeBanner.module.css */
+
+.banner_wrapper {
+    width: 100%;
+    background-image: url("/assets/images/banner_background.png");
+    background-size: cover;
+    background-position: center;
+    border-radius: 8px;
+    background-size: 260%;
+    border: 1px solid #2B2B2B;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+  }
+  
+  .content {
+    text-align: center;
+    color: white;
+    border-radius: 8px;
+    font-family: 'Open Sans', sans-serif;
+    /* border: 2px solid red; */
+    width: 100%;
+    height: 100%;
+    padding: 16px;
+    backdrop-filter: blur(var(--blur-radius-upgrade-banner)) var(--saturation-factor-upgrade-banner);
+    -webkit-backdrop-filter: blur(var(--blur-radius-upgrade-banner)) var(--saturation-factor-upgrade-banner);
+  }
+  
+  .title {
+    font-weight: var(--font-weight-semi-bold);
+    font-size: var(--font-regular-big);
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+  
+  .description {
+    font-size: var(--font-regular-small);
+    line-height: 1;
+    font-weight: var(--font-weight-regular-enlarged);
+    margin-bottom: 16px;
+  }
+  
+  .highlight {
+    color: #D63B93;
+    font-weight: var(--font-weight-bold);
+  }
+  
+  .button {
+    background-color: #D63B93;
+    color: white;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 8px;
+    height: 27px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    width: 74px;
+  }
+  

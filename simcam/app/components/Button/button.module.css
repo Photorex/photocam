@@ -1,0 +1,34 @@
+.button {
+  padding: 9px 32px;
+  border-radius: 32px;
+  font-weight: 600;
+  font-size: 16px;
+  text-align: center;
+  color: #ffffff;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  width: fit-content;
+  background: linear-gradient(128.56deg, #FF38A6 21.67%, #992DFF 81.36%);
+}
+
+.button span {
+  z-index: 10;
+  position: relative;
+}
+
+.button:before {
+  content: "";
+  display: block;
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 200%;
+  background: linear-gradient(128.56deg, #FF38A6 21.67%, #992DFF 81.36%);
+  transition: 0.2s ease-out;
+}
+
+.button:hover:before {
+  transform: translateX(-50%);
+}

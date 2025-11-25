@@ -1,0 +1,40 @@
+.loaderWrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    max-width: 567px;
+    /* gap: 16px; */
+}
+
+@media (min-width: 1000px) {
+    .loaderWrapper {
+        width: 567px;
+    }
+}
+  
+.logo {
+    width: 100%;
+    /* border: 2px solid red; */
+    /* height: 63px; */
+    /* box-shadow: 0px 0px 37.7px 0px #727272; */
+}
+  
+.text {
+    color: white;
+    font-size: var(--font-regular-medium);
+    font-weight: var(--font-weight-semi-bold);
+    text-align: center;
+}
+  
+.loader {
+    width: 64px;
+    height: 64px;
+    animation: spin 1.2s linear infinite;
+}
+  
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}

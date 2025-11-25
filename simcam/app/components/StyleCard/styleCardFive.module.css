@@ -1,0 +1,242 @@
+.card {
+  position: relative;
+  width: 453px;
+  height: 250px;
+  border-radius: 8px;
+  overflow: hidden;
+  user-select: none;
+  cursor: pointer;
+}
+
+.bg{
+  position:absolute;
+  inset:0;
+  background-image:url('../../../public/assets/images/town_background.png');
+  background-position:210% 20%;
+  background-size:120%;
+  width:120%; 
+  height:120%;
+  top:-10%;
+  left:-10%;
+  /* filter:blur(4px);        */
+  transform:rotate(7.27deg);
+  pointer-events:none;
+  clip-path: polygon(0 0, 43% 0, 42% 100%, 0% 100%);
+}
+
+.divider{
+  position:absolute;
+  width:4px;
+  height:120%;
+  top: -10%;
+  left:40%;
+  background:#494949;
+  transform:rotate(7.45deg);
+  z-index:2;                     /* above bg, below photos */
+}
+
+
+/* ----- desktop default ----- */
+.card {
+  width: 453px;
+  height: 250px;
+  border-radius: 8px;
+}
+
+.styleImage {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 288px;
+  height: 327px;
+  clip-path: polygon(12% 0, 100% 0%, 100% 100%, -2% 100%);
+  overflow: hidden;
+}
+
+/* SLIDER container holds all image slides stacked vertically */
+.slider {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+
+/* Each image in slider */
+.slideImage {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  opacity: 0;
+  transform: translateY(150%);
+  transition: all 1s ease-in-out;
+  object-fit: cover;
+  object-position: center;
+  border-radius: 16px;
+  z-index: 1;
+}
+
+.slideImage.active {
+  opacity: 1;
+  transform: translateY(0%);
+  z-index: 2;
+}
+
+.fadeMask {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 71px;
+  height: 100%;
+  /* background: linear-gradient(270deg, rgba(23,24,25,0) 0%, #171819 100%); */
+}
+
+/* avatar */
+.avatarWrapper {
+  position: absolute;
+  width: 160px;
+  height: 160px;
+  top: 16px;
+  left: 16px;
+  transform: rotate(-6.95deg);
+  border-radius: 820.51px;
+  border: 2.46px solid #2a2c2f;
+  overflow: hidden;
+}
+.avatarWrapper img {
+  object-fit: cover;
+  object-position: center 40%;
+}
+
+/* selfie badge */
+.badge {
+  position: absolute;
+  bottom: 5px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 62px;
+  height: 28px;
+  padding: 3.9px 7.8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10111.23px;
+  background: #0000004d;
+  backdrop-filter: blur(12.135px);
+  color: #fff;
+  font-size: 16px;
+  line-height: 16.58px;
+}
+
+
+@keyframes slideArrow{
+  0%  { transform:translateX(0)  rotate(6.21deg); }
+  50% { transform:translateX(10px) rotate(6.21deg); }
+  100%{ transform:translateX(0)  rotate(6.21deg); }
+}
+
+/* arrow – make sure it stays ABOVE image + name */
+.arrow {
+  position: absolute;
+  top: 119px;
+  left: 25%;
+  width: 118.74px;
+  height: 68.08px;
+  transform: rotate(-6.21deg);
+  z-index: 3;
+  overflow: visible;
+  animation:slideArrow 2.5s ease-in-out infinite;
+}
+
+/* style name */
+.name {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 52px;
+  padding-left: 16px;
+  align-content: center;
+  font-weight: 600;
+  font-size: 20px;
+  line-height: 34px;
+  color: #fff;
+  z-index: 2;
+  /* border: 2px solid white; */
+  background: linear-gradient(0deg, #000000 0%, rgba(0, 0, 0, 0) 100%);
+}
+
+
+/* “Try” button */
+.tryBtn {
+  position: absolute;
+  right: 16px;
+  bottom: 16px;
+  width: 66px;
+  height: 28px;
+  padding: 0 8px;
+  border: none;
+  border-radius: 100px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  color: #000;
+  background: linear-gradient(194.98deg, #F0B867 28.03%, #C2C368 58.14%);
+  display: none;                  /* shown on hover Desktop – always on Mobile */
+  align-items: center;
+  justify-content: center;
+  z-index: 3;
+}
+
+/* show button when card hovered (desktop) */
+.card:hover .tryBtn {
+  display: flex;
+}
+
+/* ===== MOBILE ( ≤768px ) ===== */
+@media (max-width: 768px) {
+  .card {
+    width: 340px;
+    height: 219px;
+    border-radius: 6px;
+  }
+
+  .styleImage {
+    left: 123.84px;
+    width: 216px;
+    height: 245px;
+  }
+  .fadeMask { width: 54px; }
+
+  .avatarWrapper { width: 120px; height: 120px; border: 1.85px solid #2a2c2f; }
+
+  .badge {
+    width: 46px;
+    height: 21px;
+    padding: 2.93px 5.85px;
+    font-size: 12.01px;
+    line-height: 12.44px;
+  }
+
+  .arrow {
+    width: 189.12px;
+    height: 51.10px;
+    top: 107.33px;
+    left: 15%;
+    transform: rotate(6.21deg);
+  }
+
+  .name {
+    font-size: 18px;
+    line-height: 30px;
+  }
+
+  /* mobile: button ALWAYS visible */
+  .tryBtn {
+    display: flex;
+  }
+
+  .styleImage {
+    clip-path: polygon(13% 0, 100% 0%, 100% 100%, -2% 100%);
+  }
+}

@@ -1,0 +1,251 @@
+.overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+    background: rgba(0, 0, 0, 0.6);
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .modal {
+    /* background: #111; */
+    border-radius: 16px;
+    padding: 16px;
+    width: 100%;
+    max-width: 960px;
+    align-items: center;
+    justify-content: center;
+    align-content: center;
+    /* border: 2px solid red; */
+    max-height: 90vh;
+    z-index: 99999;
+    overflow-y: auto;
+  }
+  
+  .header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    /* border: 2px solid red; */
+  }
+  
+  .closeIcon {
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+  }
+  
+  .content {
+    display: flex;
+    flex-direction: row;
+    gap: 16px;
+    justify-content: center;
+    /* border: 2px solid red; */
+  }
+  
+  .imageWrapper {
+    flex-shrink: 0;
+    max-width: 406px;
+    max-height: 752px;
+    border-radius: 32px;
+    overflow: hidden;
+  }
+  
+  .image {
+    width: 100%;
+    height: auto;
+    border-radius: 32px;
+    display: block;
+  }
+  
+  .metaBox {
+    display: flex;
+    background: #171819;
+    border-radius: 16px;
+    padding: 16px;
+    width: 246px;
+    max-height: fit-content;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    box-sizing: border-box;
+    /* border: 2px solid red; */
+  }
+  
+  .metaRow {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    /* border: 2px solid red; */
+  }
+
+  .metaLabelWrapper {
+    position: relative;
+    display: flex;
+    gap: 4px;
+  }
+  
+  .metaColumn {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  
+  .metaLabel {
+    position: absolute;
+    top: -1.5px;
+    left: 20px;
+    font-size: 14px;
+    color: #808088;
+    font-weight: 400;
+  }
+  
+  .metaValue {
+    font-size: 18px;
+    font-weight: 400;
+    color: #fff;
+  }
+  
+  @media (max-width: 1000px) {
+    .content {
+      flex-direction: column;
+    }
+  
+    .imageWrapper {
+      max-width: 100%;
+      max-height: none;
+    }
+  
+    .metaBox {
+      width: 100%;
+      max-height: none;
+    }
+  }
+
+  .detailsButtonGroupWrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .videoGenBtn {
+    background: linear-gradient(to bottom, #F0B867 28.03%, #C2C368 58.14%);
+    width: 100%;
+    border-radius: 8px;
+    padding: 8px;
+    font-size: var(--font-regular);
+    font-weight: var(--font-weight-regular-enlarged);
+    color: black;
+    border: none;
+    cursor: pointer;
+    text-align: center;
+    /* margin-top: 16px; */
+  }
+
+  .downloadBtn {
+    /* background: linear-gradient(194.98deg, #F0B867 28.03%, #C2C368 58.14%); */
+
+    background: linear-gradient(128.56deg, #E65DA9 21.67%, #9F68D3 81.36%);
+    width: 100%;
+    border-radius: 8px;
+    padding: 8px;
+    font-size: var(--font-regular);
+    font-weight: var(--font-weight-regular-enlarged);
+    color: white;
+    border: none;
+    cursor: pointer;
+    text-align: center;
+    /* margin-top: 16px; */
+  }
+  
+  .dualButtonRow {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+  }
+  
+  .gradientWrapper {
+    flex: 1;
+    padding: 1px; /* this gives the border */
+    border-radius: 8px;
+    background: linear-gradient(128.56deg, #E65DA9 21.67%, #9F68D3 81.36%);
+  }
+  
+  .innerButton {
+    width: 100%;
+    text-align: center;
+    border: none;
+    border-radius: 8px;
+    padding: 8px;
+    background-color: #171819;
+    color: white;
+    font-size: var(--font-regular);
+    cursor: pointer;
+    transition: background 0.2s ease;
+  }
+  
+  .innerButton:hover {
+    background-color: #1e1f22;
+  }
+
+
+  .promptRow {
+    display: flex;
+    border: 2px solid #2d2d2d;
+    border-radius: 8px;
+    overflow: hidden;      
+    /* height: 80px;    */
+    /* border: 2px solid red; */
+  }
+  
+  /* left gray area */
+  .promptInputWrapper {
+    background: #202122;
+    flex: 1;
+    height: 90px;
+    /* border: 2px solid red; */
+    position: relative;
+  }
+  
+  /* transparent textarea */
+  .promptInput {
+    resize: none;
+    background: transparent;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 400;
+    border: none;
+    outline: none;
+    width: 100%;
+    height: 100%;
+    padding: 8px;
+    box-sizing: border-box;
+    scrollbar-width: none;
+  }
+
+  @media (max-width: 1000px) {
+    .promptInput {
+        font-size: 16px;
+    }
+  }
+  
+  
+  .promptInput::placeholder { color: #fff; opacity: .5; }
+  
+  /* right copy button */
+  .copyBtn {
+    width: 40px;
+    min-width: 40px;
+    background: #171819;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    border-top-right-radius: 8px;
+    border-bottom-right-radius: 8px;
+  }
+  
+  .copyBtn svg { pointer-events: none; }

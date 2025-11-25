@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Site Under Maintenance</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #18191B;
+            color: #E0E0E0; /* Warmer grey color for text */
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+        header {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            text-align: center;
+        }
+        .logo {
+            max-width: 150px; /* Reduced logo size for smaller screens */
+            width: 100%; /* Ensures responsiveness */
+        }
+        .container {
+            background-color: #2C2F3670; /* Warmer grey for container background */
+            padding: 20px; /* Reduced padding for smaller screens */
+            border-radius: 16px; /* More rounded corners */
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3); /* Enhanced shadow */
+            max-width: 90%; /* More fluid width for small screens */
+            margin: auto;
+        }
+        h1 {
+            color: #b440e2; /* Warmer violet color */
+            margin-bottom: 15px; /* Reduced margin for smaller screens */
+            font-size: 24px; /* Adjusted font size */
+        }
+        p {
+            font-size: 16px; /* Slightly smaller text size */
+            margin-bottom: 15px; /* Reduced margin for smaller screens */
+            color: #f7f8f8c3;
+        }
+        .contact-info {
+            margin-top: 30px; /* Reduced margin for smaller screens */
+        }
+        a {
+            color: #b440e2; /* Brighter link color */
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .cute-image {
+            max-width: 90%; /* Ensures responsiveness */
+            border-radius: 16px; /* Rounded corners for image */
+            margin-top: 15px; /* Reduced margin for smaller screens */
+            margin-bottom: 20px; /* Reduced margin for smaller screens */
+        }
+        @media (max-width: 600px) {
+            .logo {
+                max-width: 120px; /* Further reduced logo size */
+                margin-top: 10px;
+                margin-bottom: 20px;
+            }
+            .container {
+                padding: 15px; /* Further reduced padding */
+            }
+            h1 {
+                font-size: 20px; /* Further adjusted font size */
+                margin-bottom: 10px; /* Further reduced margin */
+            }
+            p {
+                font-size: 14px; /* Further reduced font size */
+                margin-bottom: 10px; /* Further reduced margin */
+            }
+            .cute-image {
+                max-width: 100%; /* Ensures full width on small screens */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img src="/site-maintenance/Simcam.svg" alt="Logo" class="logo">
+        <h1>Site Under Maintenance</h1>
+        <img src="/site-maintenance/66b1df07f3775adac9d9b2d5.png" alt="Cute Image" class="cute-image">
+        <p>We will be back online shortly. Thank you for your patience.</p>
+        <div class="contact-info">
+            <p>If you have any questions, please contact us at <a href="mailto:hi@simcam.net">hi@simcam.net</a>.</p>
+        </div>
+    </div>
+</body>
+</html>

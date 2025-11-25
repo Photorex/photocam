@@ -1,0 +1,35 @@
+.image_card_wrapper {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    aspect-ratio: 1;
+    border-radius: 4px;
+    overflow: hidden;
+}
+  
+.image_card_image {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    border-radius: 4px;
+}
+  
+.image_card_image_element {
+    object-fit: cover;
+    /* border: 2px solid red; */
+}
+  
+.image_card_description {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    font-size: 10px;
+    font-weight: var(--font-weight-bold);
+    padding: 0 5px;
+    color: var(--text-color-white);
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.75) 20%, rgba(0, 0, 0, 0) 100%);
+    /* border: 2px solid red; */
+}

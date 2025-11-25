@@ -1,0 +1,230 @@
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+}
+
+.modal {
+    background: var(--modal-background-color);
+    border-radius: 16px;
+    /* padding: 24px; */
+    overflow-y: auto;
+    position: relative;
+    width: 632px;
+    max-height: 90vh;
+    /* top: 178px; */
+    border: 1px solid var(--modal-background-color-border);
+}
+
+.modal::-webkit-scrollbar {
+    width: 5px;
+}
+  
+.modal::-webkit-scrollbar-track {
+    background: #2e3440;
+    border-radius: 5px;
+}
+  
+.modal::-webkit-scrollbar-thumb {
+    background-color: #535353;
+    border-radius: 5px;
+    border: 3px solid #535353;
+}
+
+.popover_content_header {
+    display: flex;
+    width: 100%;
+    justify-content: flex-end;
+    align-content: center;
+    padding: 6px;
+    /* border: 2px solid red; */
+}
+
+.header_close {
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+}
+
+.modelDetailsContent {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    width: 100%;
+    padding: 0 24px 24px;
+    box-sizing: border-box;
+}
+  
+.modelDetailsContentHeadWrapper {
+    display: flex;
+    gap: 24px;
+    width: 100%;
+    align-items: flex-start;
+    flex-direction: column;
+    /* border: 2px solid red; */
+}
+
+@media (max-width: 1000px) {
+    .modelDetailsContentHeadWrapper {
+      align-items: center;
+    }
+}
+  
+@media (min-width: 1000px) {
+    .modelDetailsContentHeadWrapper {
+      flex-direction: row;
+    }
+}
+  
+.previewImageWrapper {
+    flex-shrink: 0;
+}
+  
+.previewImage {
+    width: 184px;
+    height: auto;
+    border-radius: 8px;
+    object-fit: cover;
+}
+
+@media (max-width: 1000px) {
+    .previewImage {
+        width: 140px;
+    }
+}
+  
+.detailsColumn {
+    flex-grow: 1;
+    display: flex;
+    height: 100%;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.detailsHeaderWrapper {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 16px;
+}
+
+@media (max-width: 1000px) {
+    .detailsHeaderWrapper {
+        gap: 8px;
+        align-items: center;
+    }
+}
+  
+.detailsTitle {
+    font-weight: var(--font-weight-bold);
+    font-size: var(--font-regular-big-large);
+    color: var(--text-color-white);
+}
+
+@media (max-width: 1000px) {
+    .detailsTitle {
+        font-size: var(--font-regular-medium);
+        text-align: center;
+    }
+}
+  
+.detailsDescription {
+    font-weight: 400;
+    font-size: 16px;
+    color: var(--text-color-white);
+}
+
+@media (max-width: 1000px) {
+    .detailsDescription {
+        text-align: center;
+    }
+}
+  
+.pinkHighlight {
+    color: var(--modal-text-highlight);
+}
+  
+.generateButton {
+    width: 100%;
+    height: 40px;
+    border-radius: 32px;
+    background: linear-gradient(128.56deg, #FF38A6 21.67%, #992DFF 81.36%);
+    font-weight: var(--font-weight-semi-bold);
+    font-size: var(--font-regular);
+    color: var(--text-color-white);
+    border: none;
+    cursor: pointer;
+}
+
+.content_spacer {
+    display: flex;
+    width: 100%;
+    border: 0.5px solid var(--underline-controls-menu-color);
+    /* margin: 1rem 0; */
+}
+
+.additionalImagesSection {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+}
+  
+.additionalImagesTitle {
+    font-weight: var(--font-weight-semi-bold);
+    font-size: var(--font-regular-medium);
+    color: var(--text-color-white);
+}
+  
+.additionalImagesRow {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    padding-bottom: 8px;
+    /* border: 2px solid red; */
+}
+
+.additionalImagesRow::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+}
+  
+.additionalImagesRow::-webkit-scrollbar-track {
+    background: #2e3440;
+    border-radius: 5px;
+}
+  
+.additionalImagesRow::-webkit-scrollbar-thumb {
+    background-color: #535353;
+    border-radius: 5px;
+    border: 3px solid #535353;
+}
+  
+.additionalImageWrapper {
+    flex-shrink: 0;
+    border-radius: 8px;
+    overflow: hidden;
+}
+  
+.additionalImage {
+    width: 184px;
+    height: 250px;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+@media (max-width: 500px) {
+    .additionalImage {
+        width: 140px;
+        height: 207px;
+    }
+}

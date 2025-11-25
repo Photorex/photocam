@@ -1,0 +1,62 @@
+/* Negative propmpt controller styling */
+
+.prompt_input_wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+}
+
+.neg_prompt_controls_label {
+    font-size: var(--font-regular-small);
+    font-weight: var(--font-weight-regular-enlarged);
+    color: var(--text-color-gray);
+    /* border: 2px solid red; */
+}
+
+.prompt_textarea_wrapper {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    width: 100%;
+    padding: 8px;
+    min-height: 90px;
+    max-height: 200px;
+    border: 2px solid var(--input-border-color);
+    border-radius: 8px;
+    font-size: var(--font-regular-small);
+    color: var(--text-color-gray);
+    background-color: var(--input-background-color);
+    /* border: 2px solid red; */
+}
+
+@media only screen and (max-width: 1000px) {
+    .prompt_textarea_wrapper {
+        font-size: var(--font-regular);
+    }
+}
+
+.prompt_textarea_wrapper.focused {
+    color: var(--text-color-white);
+    border: 2px solid var(--text-color-white);
+}
+
+.prompt_textarea {
+    width: 100%;
+    height: 100%;
+    background-color: var(--input-background-color);
+    resize: none;
+    outline: none;
+    transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    padding-right: 8px;
+}
+
+.prompt_textarea::-webkit-scrollbar {
+    width: 5px;
+}
+
+.prompt_textarea::-webkit-scrollbar-thumb {
+    background-color: #535353;
+    border-radius: 5px;
+    border: 3px solid #535353;
+}

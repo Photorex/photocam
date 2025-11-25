@@ -1,0 +1,1 @@
+export const APP_VERSION = '1.0.1'; // Increment this when making breaking changes 

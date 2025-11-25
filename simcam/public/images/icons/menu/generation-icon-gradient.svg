@@ -1,0 +1,11 @@
+<svg viewBox="0 0 33 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <linearGradient id="creditGradient" x1="0" y1="0" x2="1" y2="1" gradientTransform="rotate(195)">
+        <stop offset="28.03%" stop-color="#F0B867"/>
+        <stop offset="58.14%" stop-color="#C2C368"/>
+        </linearGradient>
+    </defs>
+    <path d="M4.5 8C4.5 5.79086 6.29086 4 8.5 4H24.5C26.7091 4 28.5 5.79086 28.5 8V24C28.5 26.2091 26.7091 28 24.5 28H8.5C6.29086 28 4.5 26.2091 4.5 24V8Z" stroke="url(#creditGradient)" stroke-width="2"/>
+    <path d="M4.5 20L8.8055 15.6945C9.68782 14.8122 11.1538 14.9443 11.8641 15.9703L15.2664 20.8846C15.9311 21.8447 17.2735 22.0335 18.1773 21.2941L22.4325 17.8126C23.2277 17.162 24.3866 17.2198 25.1132 17.9464L28.5 21.3333" stroke="url(#creditGradient)" stroke-width="2"/>
+    <ellipse cx="21.8333" cy="10.6667" rx="2.66667" ry="2.66667" fill="url(#creditGradient)"/>
+</svg>

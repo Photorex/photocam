@@ -1,0 +1,30 @@
+.error_page {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    /* border: 2px solid red; */
+    align-items: center;
+    justify-content: center;
+    gap: 2rem;
+    font-size: var(--font-regular-big);
+}
+
+.reset_button {
+    display: flex;
+    text-align: center;
+    vertical-align: middle;
+    align-items: center;
+    justify-content: center;
+    padding: 4px 16px;
+    background: linear-gradient(90deg, var(--gradient-color-pink) 0%, var(--gradient-color-violet) 100%);
+    color: var(--text-color-white);
+    font-size: var(--font-regular-big);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+.reset_button:hover {
+    transform: translateY(-2px);
+}

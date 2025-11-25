@@ -1,0 +1,51 @@
+.model_category_wrapper {
+    display: flex;
+    /* flex-wrap: wrap; */
+    gap: 8px;
+    margin-top: 16px;
+    /* border: 2px solid red; */
+}
+
+@media (max-width: 1000px) {
+    .model_category_wrapper {
+        padding: 0 8px;
+        overflow: scroll;
+        scrollbar-width: none;
+        padding-left: 16px;
+    }
+}
+
+@media (min-width: 1000px) {
+    .model_category_wrapper {
+        /* justify-content: space-between; */
+    }
+}
+
+.model_category_button {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    height: 33px;
+    /* min-width: 51px; */
+    padding: 6px 18px;
+    border-radius: 80px;
+    font-size: var(--font-regular-small);
+    font-weight: var(--font-weight-bold);
+    background-color: var(--input-background-color);
+    color: var(--text-color-gray);
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    /* border: 2px solid red; */
+}
+
+.model_category_button:hover {
+    background: linear-gradient(90deg, var(--text-new-gradient-start) 0%, var(--text-new-gradient-end) 100%);
+    color: black;
+}
+
+.model_category_button_active {
+    background: linear-gradient(90deg, var(--text-new-gradient-start) 0%, var(--text-new-gradient-end) 100%);
+    font-weight: var(--font-weight-semi-bold);
+    color: black;
+}

@@ -1,0 +1,105 @@
+/* Image number options styling */
+.image_number_wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    /* align-items: center; */
+    /* justify-content: start; */
+    /* border: 2px solid red; */
+}
+
+.image_number__options_label {
+    font-size: var(--font-regular-small);
+    font-weight: var(--font-weight-regular-enlarged);
+    color: var(--text-color-gray);
+    /* margin-bottom: 0.5rem; */
+    /* border: 2px solid red; */
+}
+
+.images_grid_container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    width: 100%;
+    justify-content: space-between;
+}
+
+
+@media (max-width: 1000px) {
+    .images_grid_container {
+        justify-content: start;
+    }
+}
+
+@media (max-width: 550px) {
+    .images_grid_container {
+        justify-content: space-between;
+    }
+}
+
+@media (max-width: 370px) {
+    .images_grid_container {
+        justify-content: start;
+    }
+}
+
+.images_grid_item_wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 4px;
+    background: transparent;
+    padding: 1px;
+    background: var(--text-color-gray);
+}
+  
+.images_grid_item_wrapper.selected {
+    background: linear-gradient(90deg, var(--text-new-gradient-start) 0%, var(--text-new-gradient-end) 100%);
+}
+
+.images_grid_item_wrapper:hover {
+    background: linear-gradient(90deg, var(--text-new-gradient-start) 0%, var(--text-new-gradient-end) 100%);
+}
+
+.images_grid_item_wrapper.selected .images_grid_item {
+    color: var(--text-color-white);
+}
+
+.images_grid_item {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 26px;
+    width: 27px;
+    border-radius: 4px;
+    font-size: var(--font-regular);
+    font-weight: var(--font-weight-semi-bold);
+    color: var(--text-color-gray);
+    cursor: pointer;
+    background-color: var(--input-background-color);
+    transition: all 0.3s ease-in-out;
+    /* border: 2px solid red; */
+}
+
+@media (max-width: 500px) {
+    .images_grid_item {
+        height: 25px;
+        width: 25px;
+    }
+}
+
+.images_grid_item.selected {
+    background-color: linear-gradient(90deg, var(--text-new-gradient-start-faded) 0%, var(--text-new-gradient-end-faded) 100%) !important;
+}
+
+.images_grid_item.selected {
+    background-color: var(--input-background-color-active) !important;
+}
+  
+.images_grid_item:hover {
+    background-color: var(--input-background-color-active);
+}
+  
+.images_grid_item_wrapper.selected .images_grid_item {
+    color: var(--text-color-white);
+}

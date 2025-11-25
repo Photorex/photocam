@@ -1,0 +1,139 @@
+.faq {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.h2 {
+  font-weight: 700;
+  font-size: 40px;
+  line-height: 130%;
+  text-align: center;
+  color: #ffffff;
+  margin-bottom: 32px;
+  z-index: 2;
+}
+
+.accordionItem {
+  padding-bottom: 32px;
+  border-bottom: 1px solid #2a2c2f;
+}
+
+.accordion_wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.accordionButton {
+  width: 100%;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 400;
+  font-size: 22px;
+  line-height: 136%;
+  background-color: transparent;
+  color: #ffffff;
+  outline: none;
+  border: 0;
+  text-align: left;
+}
+
+.arrow {
+  border: 1px solid #2a2c2f;
+  border-radius: 99px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  flex-shrink: 0;
+  margin-left: 16px;
+}
+
+.arrow:before {
+  content: "";
+  display: block;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 99px;
+  background: linear-gradient(193deg, #f0b867 0%, #c2c368 100%);
+  transform: rotate(-180deg);
+  transition: 0.2s ease-out;
+  opacity: 0;
+}
+
+.arrow svg {
+  z-index: 10;
+}
+
+.arrow svg path {
+  transition: 0.2s ease-out;
+}
+
+.arrow.open {
+  border-color: transparent;
+  transform: rotate(180deg);
+}
+
+.arrow.open svg path {
+  fill: #000000;
+}
+
+.arrow.open:before {
+  opacity: 1;
+}
+
+.accordionContent {
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 125%;
+  padding-right: 80px;
+  color: #808088;
+  transform: translateY(-20px);
+  opacity: 0;
+  height: 0;
+  visibility: hidden; /* Скрываем контент с помощью visibility */
+  overflow: hidden;
+  transition: transform 0.3s ease-out, opacity 0.3s ease-out,
+    height 0.3s ease-out, visibility 0.3s ease-out;
+}
+
+.accordionContent.open {
+  transform: translateY(0);
+  opacity: 1;
+  height: auto; /* Позволяет контенту занимать место */
+  visibility: visible; /* Показываем контент */
+  margin-top: 16px;
+}
+
+.accordionContent b {
+  color: #ffffff;
+  opacity: 0.8;
+}
+
+@media (max-width: 767px) {
+  .accordionButton {
+    font-weight: 400;
+    font-size: 18px;
+    line-height: 167%;
+  }
+
+  .accordionItem {
+    padding-bottom: 16px;
+  }
+
+  .accordion_wrapper {
+    gap: 16px;
+  }
+
+  .h2 {
+    margin-bottom: 16px;
+  }
+}

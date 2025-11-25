@@ -1,0 +1,82 @@
+.banner_wrapper {
+    border-radius: 4px;
+    padding: 8px 16px;
+    background: #202122;
+    border: 1px solid #2A2C2F;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .step_badge {
+    background: #4A54DD;
+    padding: 0 4px;
+    border-radius: 2px;
+    font-size: 12px;
+    font-weight: 600;
+    color: white;
+  }
+  
+  .step_text {
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 1.3;
+    color: var(--text-color-gray, #C3C3C3);
+  }
+  
+  .highlight {
+    font-weight: 600;
+    background: linear-gradient(194.98deg, #F0B867 28.03%, #C2C368 58.14%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  
+  /* === IMAGE SLIDER === */
+  .example_wrapper {
+    position: relative;
+    width: 100%;
+    max-width: 400px;
+    height: 157px;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-top: 12px;
+    cursor: ew-resize;
+  }
+  
+  .example_image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    user-select: none;
+    pointer-events: none;
+    border-radius: 8px;
+  }
+  
+  .blur_overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    backdrop-filter: blur(1.5px);
+    pointer-events: none;
+  }
+  
+  .slider_line {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background-color: white;
+    transform: translateX(-50%);
+    z-index: 2;
+  }
+  
+  .slider_dot {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 12px;
+    height: 12px;
+    background: #4A54DD;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+  }

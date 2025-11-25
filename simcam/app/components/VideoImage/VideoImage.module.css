@@ -1,0 +1,142 @@
+.prompt_input_wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+}
+  
+.prompt_controls_label {
+    font-size: var(--font-regular-small);
+    font-weight: var(--font-weight-regular-enlarged);
+    color: var(--text-color-gray);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.mask_image_delete_button {
+    cursor: pointer;
+    height: 18px;
+    width: 18px;
+    color: var(--underline-controls-menu-color);
+}
+
+.prompt_controls_label_left {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    color: var(--text-color-gray);
+    gap: 8px;
+}
+  
+.prompt_tooltip_icon {
+    height: 16px;
+    width: 16px;
+    color: white;
+    stroke: white;
+    position: relative;
+}
+  
+.prompt_tooltip {
+    background-color: transparent;
+    color: #f7f8f8;
+    z-index: 999;
+    max-width: 240px;
+    font-size: 13px;
+    line-height: 140%;
+}
+  
+/* Dropzone container */
+.dropzone_wrapper {
+    display: flex;
+    justify-content: center;
+    border-radius: 8px;
+    background-color: var(--input-background-color);
+    border: 2px solid var(--input-border-color);
+    width: 100%;
+}
+  
+/* Dropzone box */
+.dropzone {
+    position: relative;
+    width: 100%;
+    max-width: 100%;
+    min-height: 87px;
+    border: 1px solid var(--input-border-color);
+    border-radius: 4px;
+    background-color: var(--background-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    /* padding: 8px; */
+    gap: 10px;
+    box-sizing: border-box;
+    transition: height 0.2s ease;
+}
+  
+/* When image is uploaded, allow content to expand */
+.dropzone.hasImage {
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    height: auto;
+    padding: 0;
+}
+  
+/* Image preview */
+.uploaded_image {
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+    border-radius: 4px;
+    display: block;
+}
+  
+/* Label container when no image */
+.upload_label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+    padding: 8px;
+    box-sizing: border-box;
+}
+  
+.upload_icon {
+    width: 33px;
+    height: 33px;
+    flex-shrink: 0;
+}
+  
+.upload_text {
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 100%;
+    letter-spacing: 0%;
+    color: var(--text-color-gray);
+    max-width: 80%;
+}
+  
+/* Hidden input */
+.hidden_input {
+    display: none;
+}
+  
+/* Delete icon */
+.delete_btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-color-gray);
+}

@@ -1,0 +1,728 @@
+.safe_area_wrapper {
+    height: 100dvh;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    /* overflow: hidden; */
+    /* border: 2px solid red; */
+    /* padding-top: 5rem; */
+    box-sizing: border-box;
+}
+
+.onboarding_container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    /* padding: 16px; */
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+}
+
+
+/* Step one content  */
+
+
+.stepOneFullScreen {
+    position: relative;
+    width: 100%;
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+    /* border: 2px solid green; */
+}
+
+@media (min-width: 1000px) {
+    .stepOneFullScreen {
+        padding-top: 2.875rem;
+    }
+}
+
+.glidersWrapper {
+    position: relative;
+    width: 100%;
+    z-index: 2;
+}
+
+.bottomOverlay {
+    position: absolute;
+    left: 0;
+    /* Attach overlay to the bottom of the second glider, let it extend down by 5% */
+    bottom: -13%;
+    width: 100%;
+    height: 60%;
+    pointer-events: none;
+    /* border: 2px solid red; */
+    background: linear-gradient(
+        to top,
+        rgba(0,0,0,0) 0%,  
+        rgba(0, 0, 0, 0.119) 4%,    
+        rgba(11, 6, 15, 0.424) 10%,           
+        rgb(11, 6, 15) 18%,           
+        rgba(0, 0, 0, 0.6) 28%,       
+        rgba(0, 0, 0, 0.609) 67%,      
+        rgba(0,0,0,0) 100% 
+    );  
+    z-index: 5;
+}
+
+.stepOneContent {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /* justify-content: center; */
+    position: relative;
+    z-index: 6;
+    padding-top: 2rem;
+    padding-bottom: 16px;
+    gap: 16px;
+    /* border: 2px solid red; */
+    /* background: #000000c4; */
+}
+
+.content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.step {
+    width: 100%;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.next_button {
+    /* margin-top: auto; */
+    width: 100%;
+    max-width: 390px;
+    height: 48px;
+    border-radius: 32px;
+    color: white;
+    font-weight: 600;
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
+    align-self: center;
+    background: linear-gradient(128.56deg, #FF38A6 21.67%, #992DFF 81.36%) !important;
+}
+
+@media (max-width: 460px) {
+    .next_button {
+        width: calc(100% - 32px);
+    }
+}
+
+@media (max-width: 1000px) {
+    .next_buttonClicked {
+        background: linear-gradient(128.56deg, #ff38a5ac 20%, #992dffaa 80%) !important;
+        transition: background 0.3s ease;
+    }
+}
+
+@media (min-width: 1000px) {
+    .next_button:hover {
+        background: linear-gradient(128.56deg, #ff38a5ac 20%, #992dffaa 80%) !important;
+    }
+}
+
+.gliderRow {
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+    height: 224px;
+    display: flex;
+    align-items: center;
+    margin: 8px 0;
+}
+
+@media (max-width: 1000px) {
+    .gliderRow:nth-of-type(1) {
+        /* position: absolute; */
+        width: 627.67px;
+        height: 223.78px;
+        /* top: 15.57px; */
+        left: -84.82px;
+        transform: rotate(-2.61deg);
+        z-index: 1;
+    }
+
+    .gliderRow:nth-of-type(2) {
+        /* position: absolute; */
+        width: 627.67px;
+        height: 223.78px;
+        /* top: 250.63px; */
+        left: -81px;
+        transform: rotate(-2.61deg);
+        z-index: 1;
+    }
+
+    .gliderTrack {
+        gap: 12.01px !important;
+    }
+}
+
+.gliderTrack {
+    display: flex;
+    gap: 8px;
+    animation-duration: 300s;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    will-change: transform;
+    backface-visibility: hidden;
+    transform: translate3d(0, 0, 0);
+}
+
+.animateLeft {
+    animation-name: scrollLeft;
+}
+
+.animateRight {
+    animation-name: scrollRight;
+}
+
+@keyframes scrollLeft {
+    0% { transform: translateX(0%); }
+    100% { transform: translateX(-50%); }
+}
+
+@keyframes scrollRight {
+    0% { transform: translateX(-50%); }
+    100% { transform: translateX(0%); }
+}
+
+.gliderImageWrapper {
+    width: 148px;
+    height: 224px;
+    border-radius: 4.37px;
+    overflow: hidden;
+    flex-shrink: 0;
+    position: relative;
+}
+
+.gliderImage {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+}
+
+.aiPhotoBadge {
+    position: absolute;
+    bottom: 5%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 69px;
+    height: 24px;
+    border-radius: 9766.35px;
+    padding: 3.77px 7.53px;
+    background: rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(11.72px);
+    color: #FFFFFF;
+    font-weight: 400;
+    font-size: 13.1px;
+    line-height: 16.37px;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.heroTextBlock {
+    display: flex;
+    max-width: 591px;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 0 16px;
+}
+
+@media (max-width: 1000px) {
+    .heroTextBlock {
+        max-width: 343px;
+        padding: 0;
+    }
+}
+
+.heroHeadline {
+    font-weight: 700;
+    font-size: 32px;
+    line-height: 100%;
+    text-align: center;
+    color: white;
+    line-height: 1.3;
+}
+
+.heroSubtext {
+    font-family: 'Open Sans', sans-serif;
+    font-weight: 400;
+    font-size: 18px;
+    line-height: 100%;
+    text-align: center;
+    color: white;
+    line-height: 1.5;
+}
+
+.gradientText {
+    background: linear-gradient(194.98deg, #F0B867 28.03%, #C2C368 58.14%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+@media (max-width: 1000px) {
+    .heroHeadline {
+        font-size: 24px;
+    }
+
+    .heroSubtext {
+        font-size: 16px;
+    }
+
+    .mobileOnly {
+        display: inline;
+    }
+}
+
+@media (min-width: 1000px) {
+    .mobileOnly {
+        display: none;
+    }
+}
+
+
+/* Step two content */
+
+.stepTwoWrapper {
+    position: relative;
+    width: 100%;
+    height: 100svh;
+    overflow: hidden;
+}
+
+.stepTwoBackground {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 0;
+}
+
+@media (max-width: 1000px) {
+    .stepTwoBackground {
+        height: 50%;
+    }
+}
+
+.stepTwoLeftBg,
+.stepTwoRightBg {
+    flex: 1;
+    background-size: cover;
+    background-position: center;
+}
+
+.stepTwoLeftBg {
+    background-image: url('/assets/images/onboarding/step_2_left.png');
+}
+
+.stepTwoRightBg {
+    background-image: url('/assets/images/onboarding/step_2_right.png');
+}
+
+.stepTwoDivider {
+    /* position: relative;
+    right: 50%; */
+    width: 6px;
+    background: #ffffff;
+}
+
+.stepTwoGradient {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 90%;
+    background: linear-gradient(0deg, #0B060F 37.02%, rgba(11, 6, 15, 0) 100%);
+    z-index: 1;
+    pointer-events: none;
+}
+
+.stepTwoContent {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+    gap: 24px;
+}
+
+@media (max-width: 1000px) {
+
+    .stepTwoDivider {
+        width: 3px;    
+    }
+
+    .stepTwoContent {
+        top: 50%;
+    }
+
+    .stepTwoGradient {
+        background: linear-gradient(
+            to top,
+            #00000000 0%,                     
+            rgba(0, 0, 0, 0.498) 20%,  
+            rgb(0, 0, 0) 43%,       
+            rgb(0, 0, 0) 53%,       
+            rgba(0, 0, 0, 0.345) 65%, 
+            rgba(0, 0, 0, 0) 100%           
+        );
+    }
+}
+
+@media (min-width: 1000px) {
+
+    .stepTwoContent {
+        justify-content: flex-end;
+        padding-bottom: 48px;
+    }
+}
+
+.genderHeader {
+    max-width: 300px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    color: white;
+}
+
+.genderTitle {
+    font-weight: 700;
+    font-size: 32px;
+    line-height: 100%;
+}
+
+.genderSubtext {
+    font-weight: 400;
+    font-size: 18px;
+    line-height: 100%;
+}
+
+.genderOptions {
+    max-width: 343px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.genderButton {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-radius: 32px;
+    padding: 10px 16px 12px 16px;
+    height: 48px;
+    border: 1px solid #2A2C2F;
+    background: #171819;
+    color: white;
+    font-weight: 600;
+    font-size: 18px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+@media (min-width: 1000px) {
+    .genderButton:hover {
+        background: rgba(255, 255, 255, 0.15);
+    }
+}
+
+.genderButton img {
+    width: 24px;
+    height: 24px;
+}
+
+@media (max-width: 1000px) {
+    .genderButtonClicked {
+        background: rgba(255, 255, 255, 0.15) !important;
+        transition: background 0.3s ease;
+
+    }
+}
+
+
+
+/* Step 3 style */
+
+.stepThreeWrapper {
+    position: relative;
+    width: 100%;
+    height: 100dvh;
+    overflow-y: scroll;
+    scrollbar-width: none;
+    display: flex;
+    flex-direction: column;
+    /* border: 2px solid white; */
+    /* justify-content: flex-end; */
+}
+
+@media (min-width: 1000px) {
+    .stepThreeWrapper {
+        justify-content: flex-end;
+    }
+}
+
+.stepThreeGliders {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 16px;
+    /* border: 2px solid red; */
+}
+
+.stepThreeGradient {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 70%;
+    width: 100%;
+    z-index: 2;
+    pointer-events: none;
+    background: linear-gradient(0deg, #0B060F 25.02%, rgba(11, 6, 15, 0) 100%);
+}
+
+@media (max-width: 1000px) {
+    .stepThreeGradient {
+        height: 90%;
+        background: linear-gradient(
+            to top,
+            #00000000 0%,                     
+            rgba(0, 0, 0, 0) 20%,  
+            rgb(0, 0, 0) 43%,       
+            rgb(0, 0, 0) 53%,       
+            rgba(0, 0, 0, 0.345) 65%, 
+            rgba(0, 0, 0, 0) 100%           
+        );
+    }
+}
+
+@media (max-width: 390px) {
+    .stepThreeGradient {
+        height: 80%;
+        background: linear-gradient(
+            to top,
+            #00000000 0%,                     
+            rgba(0, 0, 0, 0) 20%,  
+            rgb(0, 0, 0) 43%,       
+            rgb(0, 0, 0) 53%,       
+            rgba(0, 0, 0, 0.345) 65%, 
+            rgba(0, 0, 0, 0) 100%           
+        );
+        /* border: 2px solid red; */
+    }
+}
+
+.stepFiveGradient {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 70%;
+    width: 100%;
+    z-index: 2;
+    pointer-events: none;
+    background: linear-gradient(0deg, #0B060F 25.02%, rgba(11, 6, 15, 0) 100%);
+}
+
+@media (max-width: 1000px) {
+    .stepFiveGradient {
+        height: 70%;
+        background: linear-gradient(
+            to top,
+            #00000000 0%,                     
+            rgba(0, 0, 0, 0) 20%,  
+            rgb(0, 0, 0) 43%,       
+            rgb(0, 0, 0) 53%,       
+            rgba(0, 0, 0, 0.345) 65%, 
+            rgba(0, 0, 0, 0) 100%           
+        );
+    }
+}
+
+@media (max-width: 390px) {
+    .stepFiveGradient {
+        height: 60%;
+        background: linear-gradient(
+            to top,
+            #00000000 0%,                     
+            rgba(0, 0, 0, 0) 20%,  
+            rgb(0, 0, 0) 43%,       
+            rgb(0, 0, 0) 53%,       
+            rgba(0, 0, 0, 0.345) 65%, 
+            rgba(0, 0, 0, 0) 100%           
+        );
+        /* border: 2px solid red; */
+    }
+}
+
+.stepThreeContent {
+    position: relative;
+    z-index: 3;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    padding: 24px 16px 48px;
+    text-align: center;
+    /* border: 2px solid white; */
+}
+
+@media (max-width: 1000px) {
+    .stepThreeContent {
+        margin-top: 10px;
+    }
+}
+
+.staticRow {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  overflow: visible;       
+  width: 110%;              
+  left: -5%;                
+  position: relative;
+}
+
+.staticCard {
+  width: 200px;
+  height: 278px;
+  border-radius: 8px;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: #0b060f;     
+}
+
+.staticCard img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+
+.mobileStage {
+  position: relative;
+  padding-top: 40px;
+  display: flex;
+  justify-content: center;
+  /* border: 2px solid red; */
+}
+
+/* main rectangular photo */
+.mobilePhotoFrame {
+  position: relative;
+  width: 90%;
+  max-width: 295px;
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+  border-top-left-radius: 32px;
+  border-top-right-radius: 32px;
+}
+
+.mobilePhotoFrame img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s ease-in-out;
+  border-top-left-radius: 32px;
+  border-top-right-radius: 32px;
+}
+
+.mobileVideo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s ease-in-out;
+  border-top-left-radius: 32px;
+  border-top-right-radius: 32px;
+}
+
+/* photo currently visible */
+.slideIn  { transform: translateY(0); }
+
+/* photos waiting off-screen below the frame */
+.slideOut { transform: translateY(100%); }
+
+/* gradient-ring wrapper for avatar */
+.avatarRingOne {
+  position: absolute;
+  width: 142px;
+  height: 142px;
+  left: 5%;
+  bottom: 8px;
+  border-radius: 50%;
+  padding: 2px;                    /* gradient “border” thickness */
+  background: linear-gradient(128.56deg,#E65DA9 21.67%,#9F68D3 81.36%);
+  box-sizing: border-box;
+  z-index: 3;
+}
+
+.avatarRingTwo {
+  position: absolute;
+  width: 142px;
+  height: 142px;
+  left: 5%;
+  bottom: 8px;
+  border-radius: 50%;
+  padding: 2px;                    /* gradient “border” thickness */
+  background: linear-gradient(128.56deg,#E65DA9 21.67%,#9F68D3 81.36%);
+  box-sizing: border-box;
+  z-index: 3;
+}
+
+/* actual circular image */
+.avatarRingOne img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.avatarRingTwo img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: center 5%;
+}
+
+@keyframes slideInVideo {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0%);
+    opacity: 1;
+  }
+}
+
+.mobileVideoSlideIn {
+  animation: slideInVideo 0.6s ease-in-out;
+}
