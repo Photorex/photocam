@@ -508,18 +508,13 @@ export default function LoginModal({ isOpen, onClose, order, returnTo }: LoginMo
                             className={styles.header_close} 
                             onClick={onClose}
                         />
-                    {/* {loginFirst && !isRegistering ? (
-                        //
-                        ) : (
-                    )} */}
 
-                        {!isRegisteringInProgress && (
-                            <div className={styles.glidersWrapper}>
-                                <SeamlessGlider images={topImagesFinal} direction="right" />
-                                <SeamlessGlider images={bottomImagesFinal} direction="left" />
-                                <div className={styles.bottomOverlay} />
-                            </div>
-                        )}
+                        <div className={styles.glidersWrapper}>
+                            <SeamlessGlider images={topImagesFinal} direction="right" />
+                            <SeamlessGlider images={bottomImagesFinal} direction="left" />
+                            <div className={styles.bottomOverlay} />
+                        </div>
+
                         {!isRegistering ? (
                             <div className={styles.modal_login_content__inner}>
                                 <h2 className={styles.login_h}>Log in to continue</h2>
@@ -537,8 +532,8 @@ export default function LoginModal({ isOpen, onClose, order, returnTo }: LoginMo
                                     </button>
                                 </p>
                                 <br/>
-                                <div id="google-login" className={styles.login_components_outer_wrapper}>
-                            
+                                <div className={styles.login_components_outer_wrapper}>
+                                    {/* COMMENTED OUT - Email/Password Login Form
                                     <div className={styles.login_form}>
                                         <form className={styles.login_form_inner} onSubmit={handleLoginSubmit}>
                                             <div className={styles.login_fields_wrapper}>
@@ -551,16 +546,6 @@ export default function LoginModal({ isOpen, onClose, order, returnTo }: LoginMo
                                                             onChange={handleLoginEmailChange}
                                                             maxLength={100}
                                                         />
-                                                        {/* <Input
-                                                            className={styles.login_input}
-                                                            size={isMobile ? "lg" : "md"}
-                                                            type="email"
-                                                            placeholder="Enter your email address..."
-                                                            // label="Email address"
-                                                            labelPlacement="outside"
-                                                            onChange={handleLoginEmailChange}
-                                                            maxLength={100}
-                                                        /> */}
                                                     </div>
                                                     <div className={styles.login_password_error}>
                                                         {loginEmailError && <p className={styles.error}>{loginEmailError}</p>}
@@ -575,29 +560,16 @@ export default function LoginModal({ isOpen, onClose, order, returnTo }: LoginMo
                                                             onChange={handleLoginPasswordChange}
                                                             maxLength={100}
                                                         />
-                                                        {/* <Input
-                                                            className={styles.login_input}
-                                                            size={isMobile ? "lg" : "md"}
-                                                            type={showLoginPassword ? "text" : "password"}
-                                                            placeholder="Enter your password..."
-                                                            // label="Password"
-                                                            labelPlacement="outside"
-                                                            description="at least 8 characters long"
-                                                            onChange={handleLoginPasswordChange}
-                                                            maxLength={100}
-                                                        /> */}
                                                         <button 
                                                             type="button" 
                                                             className={styles.input_password_show_login} 
                                                             onClick={togglePasswordVisibility}>
                                                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-eye "><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg>
                                                         </button>
-                                                        {/* <div className={styles.input_help}>at least 8 characters long</div> */}
                                                     </div>
                                                     <div className={styles.login_password_error}>
                                                         {loginPasswordError && <p className={styles.error}>{loginPasswordError}</p>}
                                                     </div>
-
                                                     <div className={styles.login_button_wrapper}>
                                                         <button type="submit" className={styles.login_button}>
                                                             Log in
@@ -608,255 +580,140 @@ export default function LoginModal({ isOpen, onClose, order, returnTo }: LoginMo
                                                             </a>
                                                         </span>
                                                     </div>
-
                                                     <div className={styles.login_actions_wrapper}>
-                                                        {/* <div className={styles.login_button_wrapper}>
-                                                            <button type="submit" className={styles.login_button}>
-                                                                Log in
-                                                            </button>
-                                                            <span className={styles.login_foot}>
-                                                                <a href="/forgot-password">
-                                                                    Forgot your password?
-                                                                </a>
-                                                            </span>
-                                                        </div> */}
-
                                                         <div className={styles.divider_login}>
                                                             <div className={styles.divider_line}>
                                                                 <div className={styles.divider_text}>
-                                                                    <span >Or sign up with</span>
+                                                                    <span>Or sign up with</span>
                                                                 </div>
                                                             </div>
                                                         </div>
-
-                                                        <button 
-                                                            onClick={async (e) => {
-                                                                e.preventDefault();
-                                                                
-                                                                const fingerprintId = await getFingerprintID();
-
-                                                                if (fingerprintId) {
-                                                                    document.cookie = `fingerprintId=${JSON.stringify({ fingerprintId })}; path=/; max-age=31536000; samesite=Lax`;
-                                                                }
-
-                                                                await signIn('google', { callbackUrl });
-                                                                
-                                                            }} 
-                                                            className={styles.google_button_inner_wrapper}>
-                                                            <div className={styles.google_button}>
-                                                                <div className={styles.google_button_icon_wrapper}>
-                                                                    <div className={styles.google_button_icon}>
-                                                                        <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="18px" height="18px" viewBox="0 0 48 48" className="abcRioButtonSvg"><g><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"></path><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"></path><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"></path><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"></path><path fill="none" d="M0 0h48v48H0z"></path></g></svg>
-                                                                    </div>
-                                                                </div>
-                                                                <span className={styles.google_button_text_wrapper}>
-                                                                    Sign in with Google
-                                                                </span>
-                                                            </div>
-                                                        </button>
                                                     </div>
                                                 </div>    
                                             </div>       
                                         </form>
                                     </div>
+                                    */}
+                                    
+                                    <button 
+                                        onClick={async (e) => {
+                                            e.preventDefault();
+                                            const fingerprintId = await getFingerprintID();
+                                            if (fingerprintId) {
+                                                document.cookie = `fingerprintId=${JSON.stringify({ fingerprintId })}; path=/; max-age=31536000; samesite=Lax`;
+                                            }
+                                            await signIn('google', { callbackUrl });
+                                        }} 
+                                        className={styles.google_button_inner_wrapper}>
+                                        <div className={styles.google_button}>
+                                            <div className={styles.google_button_icon_wrapper}>
+                                                <div className={styles.google_button_icon}>
+                                                    <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="18px" height="18px" viewBox="0 0 48 48" className="abcRioButtonSvg"><g><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"></path><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"></path><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"></path><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"></path><path fill="none" d="M0 0h48v48H0z"></path></g></svg>
+                                                </div>
+                                            </div>
+                                            <span className={styles.google_button_text_wrapper}>
+                                                Sign in with Google
+                                            </span>
+                                        </div>
+                                    </button>
                                 </div>
                             </div>
                         ) : (
                             <div className={styles.modal_login_content__inner}>
-                                {
-                                    isRegisteringInProgress ? (
-                                        <div style={{ textAlign: 'center', padding: '20px' }}>
-                                            <Spinner
-                                                color="secondary"
-                                            />
-                                        </div>
-                                    ) : registrationStatus ? (
-                                        <div className={styles.activation_link}>
-                                            Registration successful, We have sent verification link to you. <br /> <br />
-                                            Please check your email to confirm your Email address. Make sure to look in your spam folder if you can&apos;t find it.  <br /> <br />
-                                            Click the link to verify Email address ownership.
-                                        </div>
-                                    ) : (
-                                    // Content for login
-                                    <div className={styles.register_wrapper}>
-                                        
-                                        <div id="google-login" className={styles.register_components_outer_wrapper}>
-                                            <h2 className={styles.login_h}>Create an account</h2>
-                                                <p className={styles.login_p}>
-                                                    Already have an account? <button className={styles.create_acc_link} onClick={toggleIsRegistering}><div className={styles.create_acc_link_text}>Log in</div></button>
-                                                </p>
-                                            <br/>
-                                            {/* <p 
-                                                className={styles.register_license}
-                                            >
-                                                By signing up, you agree to our <a 
-                                                    href="/legal/terms-of-service" 
-                                                    target="_blank" 
-                                                >
-                                                    Terms of Service
-                                                </a> and <a 
-                                                    href="/legal/privacy-policy" 
-                                                    target="_blank" 
-                                                >
-                                                    Privacy Policy
-                                                </a>
-                                                .
-                                            </p> */}
+                                <div className={styles.register_wrapper}>
+                                    <div className={styles.register_components_outer_wrapper}>
+                                        <h2 className={styles.login_h}>Create an account</h2>
+                                        <p className={styles.login_p}>
+                                            Already have an account? <button className={styles.create_acc_link} onClick={toggleIsRegistering}><div className={styles.create_acc_link_text}>Log in</div></button>
+                                        </p>
+                                        <br/>
 
-                                            <div className={styles.login_form}>
-                                                <form className={styles.login_form_inner} onSubmit={handleRegisterSubmit}>
-                                                    <div className={styles.login_fields_wrapper}>
-                                                        {/* <div className={styles.login_input_field_wrapper}>
-                                                            <div className={styles.login_input_wrapper}>
-                                                                <Input
-                                                                    className={styles.login_input}
-                                                                    size={isMobile ? "lg" : "md"}
-                                                                    type="text"
-                                                                    placeholder="Enter your name..."
-                                                                    label="Name"
-                                                                    labelPlacement="outside"
-                                                                    onChange={handleRegisterNameChange}
-                                                                    value={registerName}
-                                                                    maxLength={50}
-                                                                />
-                                                            </div>
-                                                            <div className={styles.login_password_error}>
-                                                                {registerNameError && <p className={styles.error}>{registerNameError}</p>}
-                                                            </div>
-                                                        </div> */}
-                                                        <div className={styles.login_input_field_wrapper}>
-                                                            <div className={`${styles['login_input_wrapper']}`}>
-                                                                
-                                                                <input
-                                                                    className={`${styles.login_input} ${styles.customInput}`}
-                                                                    type="email"
-                                                                    placeholder="Enter your email"
-                                                                    onChange={handleRegisterEmailChange}
-                                                                    maxLength={100}
-                                                                />
-                                                                {/* <Input
-                                                                    className={styles.login_input}
-                                                                    size={isMobile ? "lg" : "md"}
-                                                                    type="email"
-                                                                    placeholder="Enter your email address..."
-                                                                    label="Email address"
-                                                                    labelPlacement="outside"
-                                                                    onChange={handleRegisterEmailChange}
-                                                                    maxLength={100}
-                                                                /> */}
-                                                            </div>
-                                                            <div className={styles.login_password_error}>
-                                                                {registerEmailError && <p className={styles.error}>{registerEmailError}</p>}
-                                                            </div>
+                                        {/* COMMENTED OUT - Email/Password Registration Form
+                                        <div className={styles.login_form}>
+                                            <form className={styles.login_form_inner} onSubmit={handleRegisterSubmit}>
+                                                <div className={styles.login_fields_wrapper}>
+                                                    <div className={styles.login_input_field_wrapper}>
+                                                        <div className={`${styles['login_input_wrapper']}`}>
+                                                            <input
+                                                                className={`${styles.login_input} ${styles.customInput}`}
+                                                                type="email"
+                                                                placeholder="Enter your email"
+                                                                onChange={handleRegisterEmailChange}
+                                                                maxLength={100}
+                                                            />
                                                         </div>
-                                                        <div className={styles.login_input_field_wrapper}>
-                                                            <div className={styles.login_input_wrapper}>
-                                                                <input
-                                                                    className={`${styles.login_input} ${styles.customInput}`}
-                                                                    type={showLoginPassword ? 'text' : 'password'}
-                                                                    placeholder="Enter your password..."
-                                                                    onChange={handleRegisterPasswordChange}
-                                                                    maxLength={50}
-                                                                />
-                                                                {/* <Input
-                                                                    className={styles.login_input}
-                                                                    size={isMobile ? "lg" : "md"}
-                                                                    type={showRegisterPassword ? "text" : "password"}
-                                                                    placeholder="Enter your password..."
-                                                                    label="Create Password"
-                                                                    labelPlacement="outside"
-                                                                    description="at least 8 characters long"
-                                                                    onChange={handleRegisterPasswordChange}
-                                                                    maxLength={50}
-                                                                /> */}
-                                                                <button 
-                                                                    type="button" 
-                                                                    className={styles.input_password_show} 
-                                                                    onClick={toggleRegisterPasswordVisibility}>
-                                                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-eye "><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-                                                                </button>
-                                                                <div className={styles.input_help}>at least 8 characters long</div>
-                                                            </div>
-                                                            <div className={styles.login_password_error}>
-                                                                {registerPasswordError && <p className={styles.error}>{registerPasswordError}</p>}
-                                                            </div>
-                                                        </div>
-                                                        {/* <div className={styles.login_input_field_wrapper}>
-                                                            <div className={styles.login_input_wrapper}>
-                                                                <Input
-                                                                    className={styles.login_input}
-                                                                    size={isMobile ? "lg" : "md"}
-                                                                    type={showConfirmPassword ? "text" : "password"}
-                                                                    placeholder="Enter your password..."
-                                                                    label="Confirm Password"
-                                                                    labelPlacement="outside"
-                                                                    description="Type your password one more time"
-                                                                    onChange={handleConfirmPasswordChange}
-                                                                    maxLength={50}
-                                                                />
-                                                                <button 
-                                                                    type="button" 
-                                                                    className={styles.input_password_show} 
-                                                                    onClick={toggleConfirmPasswordVisibility}>
-                                                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-eye "><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg>
-                                                                </button>
-                                                            </div>
-                                                            <div className={styles.login_password_error}>
-                                                                {confirmPasswordError && <p className={styles.error}>{confirmPasswordError}</p>}
-                                                            </div>
-                                                        </div> */}
-                                                        <div className={styles.login_button_wrapper}>
-                                                            <button 
-                                                                type="submit"  
-                                                                className={styles.login_button}
-                                                            >
-                                                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-lock "><rect width="18" height="11" x="3" y="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-                                                                Register
-                                                            </button>
-                                                        </div>
-
-                                                        <div className={styles.login_actions_wrapper}>
-
-                                                            <div className={styles.divider_login}>
-                                                                <div className={styles.divider_line}>
-                                                                    <div className={styles.divider_text}>
-                                                                        <span >Or sign up with</span>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                            
-                                                            <button 
-                                                                onClick={async (e) => {
-                                                                    e.preventDefault();
-                                                                    
-                                                                    const fingerprintId = await getFingerprintID();
-
-                                                                    if (fingerprintId) {
-                                                                        document.cookie = `fingerprintId=${JSON.stringify({ fingerprintId })}; path=/; max-age=31536000; samesite=Lax`;
-                                                                    }
-
-                                                                    await signIn('google', { callbackUrl });
-                                                                }} 
-                                                                className={styles.google_button_inner_wrapper}
-                                                            >
-                                                                <div className={styles.google_button}>
-                                                                    <div className={styles.google_button_icon_wrapper}>
-                                                                        <div className={styles.google_button_icon}>
-                                                                            <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="18px" height="18px" viewBox="0 0 48 48" className="abcRioButtonSvg"><g><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"></path><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"></path><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"></path><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"></path><path fill="none" d="M0 0h48v48H0z"></path></g></svg>
-                                                                        </div>
-                                                                    </div>
-                                                                    <span className={styles.google_button_text_wrapper}>
-                                                                        Sign up with Google
-                                                                    </span>
-                                                                </div>
-                                                            </button>
+                                                        <div className={styles.login_password_error}>
+                                                            {registerEmailError && <p className={styles.error}>{registerEmailError}</p>}
                                                         </div>
                                                     </div>
-                                                </form>
-                                            </div>
+                                                    <div className={styles.login_input_field_wrapper}>
+                                                        <div className={styles.login_input_wrapper}>
+                                                            <input
+                                                                className={`${styles.login_input} ${styles.customInput}`}
+                                                                type={showLoginPassword ? 'text' : 'password'}
+                                                                placeholder="Enter your password..."
+                                                                onChange={handleRegisterPasswordChange}
+                                                                maxLength={50}
+                                                            />
+                                                            <button 
+                                                                type="button" 
+                                                                className={styles.input_password_show} 
+                                                                onClick={toggleRegisterPasswordVisibility}>
+                                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-eye "><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                                                            </button>
+                                                            <div className={styles.input_help}>at least 8 characters long</div>
+                                                        </div>
+                                                        <div className={styles.login_password_error}>
+                                                            {registerPasswordError && <p className={styles.error}>{registerPasswordError}</p>}
+                                                        </div>
+                                                    </div>
+                                                    <div className={styles.login_button_wrapper}>
+                                                        <button 
+                                                            type="submit"  
+                                                            className={styles.login_button}
+                                                        >
+                                                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-lock "><rect width="18" height="11" x="3" y="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                                                            Register
+                                                        </button>
+                                                    </div>
+                                                    <div className={styles.login_actions_wrapper}>
+                                                        <div className={styles.divider_login}>
+                                                            <div className={styles.divider_line}>
+                                                                <div className={styles.divider_text}>
+                                                                    <span>Or sign up with</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </form>
                                         </div>
+                                        */}
+                                        
+                                        <button 
+                                            onClick={async (e) => {
+                                                e.preventDefault();
+                                                const fingerprintId = await getFingerprintID();
+                                                if (fingerprintId) {
+                                                    document.cookie = `fingerprintId=${JSON.stringify({ fingerprintId })}; path=/; max-age=31536000; samesite=Lax`;
+                                                }
+                                                await signIn('google', { callbackUrl });
+                                            }} 
+                                            className={styles.google_button_inner_wrapper}
+                                        >
+                                            <div className={styles.google_button}>
+                                                <div className={styles.google_button_icon_wrapper}>
+                                                    <div className={styles.google_button_icon}>
+                                                        <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="18px" height="18px" viewBox="0 0 48 48" className="abcRioButtonSvg"><g><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"></path><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"></path><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"></path><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"></path><path fill="none" d="M0 0h48v48H0z"></path></g></svg>
+                                                    </div>
+                                                </div>
+                                                <span className={styles.google_button_text_wrapper}>
+                                                    Sign up with Google
+                                                </span>
+                                            </div>
+                                        </button>
                                     </div>
-                                )}   
+                                </div>
                             </div>
                         )}
                     </div>
