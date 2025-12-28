@@ -36,10 +36,11 @@ export async function connectMongoDB() {
   
   if (!cached.promise) {
     cached.promise = mongoose.connect(MONGODB_URI, {
-      maxPoolSize: 50,                // you already set this
+      maxPoolSize: 100,                // Increased from 50 to 100
+      minPoolSize: 10,                 // Keep minimum 10 connections ready
       serverSelectionTimeoutMS: 30_000,
       socketTimeoutMS: 120_000,
-      heartbeatFrequencyMS: 30_000, // Add heartbeat to detect stale connections
+      heartbeatFrequencyMS: 10_000,    // Check every 10 seconds (was 30s)
       bufferCommands: false,
     });
   }

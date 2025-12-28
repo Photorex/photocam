@@ -16,15 +16,13 @@ import { VersionProvider } from "./VersionContext";
 export const AppContextProvider = ({ children }: { children: ReactNode }) => {
   return (
     <UserContextProvider>
-        <UserContextProvider>
-            <ControlMenuProvider>
-                <UserImagesProvider>
-                    <UserVideosProvider>
-                        {children}
-                    </UserVideosProvider>
-                </UserImagesProvider>
-            </ControlMenuProvider>
-        </UserContextProvider>
+      <ControlMenuProvider>
+        <UserImagesProvider>
+          <UserVideosProvider>
+            {children}
+          </UserVideosProvider>
+        </UserImagesProvider>
+      </ControlMenuProvider>
     </UserContextProvider>
   );
 };

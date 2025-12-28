@@ -4,7 +4,7 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { APP_VERSION } from '@/app/lib/version';
 
 const VERSION_KEY = 'app_version';
-const VERSION_CHECK_INTERVAL = 5 * 60 * 1000; // 5 minutes
+const VERSION_CHECK_INTERVAL = 30 * 60 * 1000; // 30 minutes (increased from 5 to reduce server load)
 
 interface VersionContextType {
   currentVersion: string;
@@ -23,6 +23,16 @@ const VersionContext = createContext<VersionContextType>({
 export const VersionProvider = ({ children }: { children: React.ReactNode }) => {
   const [currentVersion, setCurrentVersion] = useState(APP_VERSION);
   const [isOutdated, setIsOutdated] = useState(false);
+  const [lastUserActivity, setLastUserActivity] = useState(Date.now());
+  
+  // Track user activity to prevent refresh during active use
+  useEffect(() => {
+    const updateActivity = () => setLastUserActivity(Date.now());
+    const events = ['mousedown', 'keydown', 'scroll', 'touchstart'];
+    
+    events.forEach(event => window.addEventListener(event, updateActivity));
+    return () => events.forEach(event => window.removeEventListener(event, updateActivity));
+  }, []);
   
   const checkVersion = async () => {
     try {
@@ -40,8 +50,9 @@ export const VersionProvider = ({ children }: { children: React.ReactNode }) => 
           console.log(`Version mismatch: stored=${storedVersion}, server=${version}`);
           setIsOutdated(true);
           
-          // Auto-refresh after a short delay
-          setTimeout(forceRefresh, 500);
+          // REMOVED AUTO-REFRESH - only show banner to user
+          // User can manually refresh when ready
+          // setTimeout(forceRefresh, 500); // REMOVED THIS
         } else {
           localStorage.setItem(VERSION_KEY, version);
           setCurrentVersion(version);
@@ -104,9 +115,12 @@ export const VersionProvider = ({ children }: { children: React.ReactNode }) => 
           color: 'white',
           textAlign: 'center',
           padding: '10px',
-          zIndex: 9999
-        }}>
-          App update available. Refreshing...
+          zIndex: 9999,
+          cursor: 'pointer'
+        }}
+        onClick={forceRefresh}
+        >
+          App update available. Click here to refresh.
         </div>
       )}
     </VersionContext.Provider>
