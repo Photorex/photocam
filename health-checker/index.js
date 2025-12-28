@@ -1,50 +1,63 @@
-const http = require("http"); // Built-in HTTP module
+const http = require("http");
 const { exec } = require("child_process");
 
 // Configuration
-const TEST_ROUTE_URL = "http://localhost:3000/api/status/test"; // Adjust URL as per your server
+const TEST_ROUTE_URL = "http://localhost:3000/api/status/test";
 const CHECK_INTERVAL = 60000; // Check every 60 seconds
+const INITIAL_DELAY = 10000; // Wait 10 seconds before first check
+const MAX_FAILURES = 3; // Allow 3 consecutive failures before restarting
 const EXPECTED_RESPONSE = { status: "ok", message: "Test route working" };
+
+let consecutiveFailures = 0;
+let isRestarting = false;
 
 // Function to restart PM2
 function restartPM2() {
-  console.log("Restarting application with PM2...");
+  if (isRestarting) {
+    console.log("Restart already in progress, skipping...");
+    return;
+  }
+  
+  isRestarting = true;
+  console.log(`Restarting application with PM2 after ${consecutiveFailures} consecutive failures...`);
+  
   exec("pm2 restart simcam", (error, stdout, stderr) => {
     if (error) {
       console.error(`Error restarting PM2: ${error.message}`);
-      return;
-    }
-    if (stderr) {
+    } else if (stderr) {
       console.error(`PM2 stderr: ${stderr}`);
-      return;
+    } else {
+      console.log(`PM2 restarted successfully`);
     }
-    console.log(`PM2 stdout: ${stdout}`);
+    
+    // Reset flags after restart
+    consecutiveFailures = 0;
+    setTimeout(() => {
+      isRestarting = false;
+    }, 30000); // Prevent rapid restarts - wait 30 seconds
   });
 }
 
 // Function to test the route
 function checkHealth() {
-  console.log(`Checking health at ${TEST_ROUTE_URL}...`);
+  console.log(`[${new Date().toISOString()}] Checking health at ${TEST_ROUTE_URL}...`);
 
-  // Parse URL to determine host and path
   const url = new URL(TEST_ROUTE_URL);
   const options = {
     hostname: url.hostname,
-    port: url.port,
-    path: url.pathname,
+    port: url.port || 3000,
+    path: url.pathname + url.search,
     method: "GET",
-    timeout: 5000, // 5-second timeout
+    timeout: 5000,
   };
 
   const req = http.request(options, (res) => {
     let data = "";
 
-    // Handle response data
     res.on("data", (chunk) => {
       data += chunk;
     });
 
-    // Handle response end
     res.on("end", () => {
       try {
         const jsonData = JSON.parse(data);
@@ -53,35 +66,80 @@ function checkHealth() {
           res.statusCode !== 200 ||
           JSON.stringify(jsonData) !== JSON.stringify(EXPECTED_RESPONSE)
         ) {
-          console.error("Unexpected response:", res.statusCode, jsonData);
-          restartPM2();
+          consecutiveFailures++;
+          console.error(
+            `[${new Date().toISOString()}] Unexpected response (failure ${consecutiveFailures}/${MAX_FAILURES}):`,
+            res.statusCode,
+            jsonData
+          );
+          
+          if (consecutiveFailures >= MAX_FAILURES) {
+            restartPM2();
+          }
         } else {
-          console.log("Health check passed.");
+          if (consecutiveFailures > 0) {
+            console.log(`[${new Date().toISOString()}] Health check recovered after ${consecutiveFailures} failures.`);
+          } else {
+            console.log(`[${new Date().toISOString()}] Health check passed.`);
+          }
+          consecutiveFailures = 0;
         }
       } catch (error) {
-        console.error("Error parsing response:", error.message);
-        restartPM2();
+        consecutiveFailures++;
+        console.error(
+          `[${new Date().toISOString()}] Error parsing response (failure ${consecutiveFailures}/${MAX_FAILURES}):`,
+          error.message,
+          "Data:",
+          data
+        );
+        
+        if (consecutiveFailures >= MAX_FAILURES) {
+          restartPM2();
+        }
       }
     });
   });
 
-  // Handle errors (e.g., connection issues or timeouts)
   req.on("error", (error) => {
-    console.error("Health check failed:", error.message);
-    restartPM2();
+    consecutiveFailures++;
+    console.error(
+      `[${new Date().toISOString()}] Health check failed (failure ${consecutiveFailures}/${MAX_FAILURES}):`,
+      error.message
+    );
+    
+    if (consecutiveFailures >= MAX_FAILURES) {
+      restartPM2();
+    }
   });
 
   req.on("timeout", () => {
-    console.error("Health check timed out.");
-    req.destroy(); // Abort the request
-    restartPM2();
+    consecutiveFailures++;
+    console.error(
+      `[${new Date().toISOString()}] Health check timed out (failure ${consecutiveFailures}/${MAX_FAILURES}).`
+    );
+    req.destroy();
+    
+    if (consecutiveFailures >= MAX_FAILURES) {
+      restartPM2();
+    }
   });
 
   req.end();
 }
 
-// Run the health check periodically
-setInterval(checkHealth, CHECK_INTERVAL);
+// Start health checking after initial delay
+console.log(`Health checker starting... will begin checks in ${INITIAL_DELAY/1000} seconds`);
+setTimeout(() => {
+  console.log("Starting health checks...");
+  checkHealth();
+  setInterval(checkHealth, CHECK_INTERVAL);
+}, INITIAL_DELAY);
 
-// Run the check immediately when the script starts
-checkHealth();
+// Keep the process alive
+process.on('uncaughtException', (error) => {
+  console.error(`[${new Date().toISOString()}] Uncaught exception:`, error);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error(`[${new Date().toISOString()}] Unhandled rejection:`, reason);
+});
