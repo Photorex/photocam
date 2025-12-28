@@ -19,13 +19,15 @@ export async function GET() {
     }
     
     // Get connection pool info if available
-    let poolInfo = {};
+    let poolInfo: { poolSize?: number; availableConnections?: number } = {};
     try {
       const client = mongoose.connection.getClient();
-      if (client && client.topology) {
+      // Access topology using any type to bypass TypeScript restrictions
+      const topology = (client as any).topology;
+      if (topology && topology.s && topology.s.pool) {
         poolInfo = {
-          poolSize: client.topology.s?.pool?.totalConnectionCount || 0,
-          availableConnections: client.topology.s?.pool?.availableConnectionCount || 0
+          poolSize: topology.s.pool.totalConnectionCount || 0,
+          availableConnections: topology.s.pool.availableConnectionCount || 0
         };
       }
     } catch (poolError) {
