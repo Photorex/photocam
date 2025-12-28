@@ -1,0 +1,69 @@
+Example output when you run ./START_PROCESSES.sh:
+
+╔════════════════════════════════════════════════════════════╗
+║  PM2 Process Startup Script
+╚════════════════════════════════════════════════════════════╝
+✓ PM2 is installed
+╔════════════════════════════════════════════════════════════╗
+║  Starting Simcam (Next.js App)
+╚════════════════════════════════════════════════════════════╝
+✓ Simcam directory exists
+✓ Port 3000 is available
+ℹ Starting simcam process...
+[PM2] Starting /var/www/simcam/photo/simcam/node_modules/next/dist/bin/next in fork_mode (1 instance)
+[PM2] Done.
+ℹ Waiting for simcam to start...
+✓ Simcam is online
+✓ Simcam is responding on port 3000
+
+╔════════════════════════════════════════════════════════════╗
+║  Starting Health Checker
+╚════════════════════════════════════════════════════════════╝
+✓ Health Checker directory exists
+ℹ Starting health-checker process...
+[PM2] Starting /var/www/simcam/photo/health-checker/index.js in fork_mode (1 instance)
+[PM2] Done.
+ℹ Waiting for health-checker to start...
+✓ Health Checker is online
+
+╔════════════════════════════════════════════════════════════╗
+║  Starting Webhook Server
+╚════════════════════════════════════════════════════════════╝
+✓ Webhook Server directory exists
+✓ Port 4000 is available
+ℹ Starting webhook_server process...
+[PM2] Starting /var/www/simcam/photo/webhook_server/server.js in fork_mode (1 instance)
+[PM2] Done.
+ℹ Waiting for webhook_server to start...
+✓ Webhook Server is online
+✓ Webhook Server is responding on port 4000
+
+╔════════════════════════════════════════════════════════════╗
+║  Starting Mongo Backup
+╚════════════════════════════════════════════════════════════╝
+✓ Mongo Backup directory exists
+ℹ Starting mongo-backup process...
+[PM2] Starting /var/www/simcam/photo/mongo-backup/backup.js in fork_mode (1 instance)
+[PM2] Done.
+ℹ Waiting for mongo-backup to start...
+✓ Mongo Backup is online
+
+╔════════════════════════════════════════════════════════════╗
+║  Process Status
+╚════════════════════════════════════════════════════════════╝
+┌────┬────────────────┬─────────┬─────────┬──────┬────────┬───────────┐
+│ id │ name           │ mode    │ pid     │ ↺    │ status │ cpu  │ mem│
+├────┼────────────────┼─────────┼─────────┼──────┼────────┼──────┼────┤
+│ 0  │ simcam         │ fork    │ 123456  │ 0    │ online │ 0%   │ 70M│
+│ 1  │ health-checker │ fork    │ 123457  │ 0    │ online │ 0%   │ 20M│
+│ 2  │ webhook_server │ fork    │ 123458  │ 0    │ online │ 0%   │ 50M│
+│ 3  │ mongo-backup   │ fork    │ 123459  │ 0    │ online │ 0%   │ 30M│
+└────┴────────────────┴─────────┴─────────┴──────┴────────┴──────┴────┘
+
+ℹ To save this configuration: pm2 save
+ℹ To setup auto-start on boot: pm2 startup
+ℹ To view logs: pm2 logs
+ℹ To monitor: pm2 monit
+
+✓ Startup complete!
+
