@@ -1,5 +1,7 @@
 const http = require("http");
 const { exec } = require("child_process");
+const fs = require("fs");
+const path = require("path");
 
 // Configuration
 const TEST_ROUTE_URL = "http://localhost:3000/api/status/test";
@@ -9,39 +11,92 @@ const INITIAL_DELAY = 10000; // Wait 10 seconds before first check
 const MAX_FAILURES = 3; // Allow 3 consecutive failures before restarting
 const EXPECTED_RESPONSE = { status: "ok", message: "Test route working" };
 
+// Logging configuration
+const LOG_DIR = "/home/dev2/.pm2/logs/critical";
+const LOG_FILE = path.join(LOG_DIR, "health-checker-critical.log");
+
+// Ensure log directory exists
+try {
+  if (!fs.existsSync(LOG_DIR)) {
+    fs.mkdirSync(LOG_DIR, { recursive: true });
+  }
+} catch (error) {
+  console.error("Failed to create log directory:", error);
+}
+
+// Enhanced logging function
+function logCritical(level, message, details = null) {
+  const timestamp = new Date().toISOString();
+  let logMessage = `[${timestamp}] [${level}] ${message}`;
+  
+  if (details) {
+    logMessage += `\nDetails: ${JSON.stringify(details, null, 2)}`;
+  }
+  
+  logMessage += '\n' + '='.repeat(80) + '\n';
+  
+  // Log to console
+  console.log(logMessage);
+  
+  // Log to file for WARN, ERROR, CRITICAL
+  if (level !== "INFO") {
+    try {
+      fs.appendFileSync(LOG_FILE, logMessage);
+    } catch (error) {
+      console.error("Failed to write to log file:", error);
+    }
+  }
+}
+
 let consecutiveFailures = 0;
 let isRestarting = false;
 
 // Function to restart PM2
 function restartPM2() {
   if (isRestarting) {
-    console.log("Restart already in progress, skipping...");
+    logCritical("WARN", "Already restarting, skipping...");
     return;
   }
-  
+
   isRestarting = true;
-  console.log(`Restarting application with PM2 after ${consecutiveFailures} consecutive failures...`);
   
+  logCritical("CRITICAL", `Health check failed ${MAX_FAILURES} times. Restarting simcam...`, {
+    consecutiveFailures,
+    maxFailures: MAX_FAILURES,
+    lastCheckTime: new Date().toISOString(),
+  });
+
   exec("pm2 restart simcam", (error, stdout, stderr) => {
     if (error) {
-      console.error(`Error restarting PM2: ${error.message}`);
-    } else if (stderr) {
-      console.error(`PM2 stderr: ${stderr}`);
-    } else {
-      console.log(`PM2 restarted successfully`);
+      logCritical("ERROR", "Error restarting PM2", {
+        error: error.message,
+        stderr,
+      });
+      return;
+    }
+    if (stderr) {
+      logCritical("WARN", "PM2 restart stderr", { stderr });
     }
     
-    // Reset flags after restart
+    logCritical("INFO", "PM2 restart successful", { stdout });
+
+    // Reset failure count after restart
     consecutiveFailures = 0;
+
+    // Prevent immediate restart - wait 30 seconds before allowing another restart
     setTimeout(() => {
       isRestarting = false;
-    }, 30000); // Prevent rapid restarts - wait 30 seconds
+      logCritical("INFO", "Restart cooldown finished, ready to check again");
+    }, 30000);
   });
 }
 
 // Function to test the route
 function checkHealth() {
-  console.log(`[${new Date().toISOString()}] Checking health at ${TEST_ROUTE_URL}...`);
+  const checkStartTime = Date.now();
+  
+  logCritical("INFO", "=== Starting health check ===");
+  logCritical("INFO", `Checking health at ${TEST_ROUTE_URL}...`);
 
   const url = new URL(TEST_ROUTE_URL);
   const options = {
@@ -52,7 +107,14 @@ function checkHealth() {
     timeout: 10000,
   };
 
-  const req = http.request(options, (res) => {
+  let healthCheckPassed = false;
+  let dbCheckPassed = false;
+  let healthCheckDuration = 0;
+  let dbCheckDuration = 0;
+
+  // Perform main app health check
+  const appCheckStart = Date.now();
+  const appReq = http.request(options, (res) => {
     let data = "";
 
     res.on("data", (chunk) => {
@@ -60,89 +122,77 @@ function checkHealth() {
     });
 
     res.on("end", () => {
+      healthCheckDuration = Date.now() - appCheckStart;
+      
       try {
         const jsonData = JSON.parse(data);
 
         if (
-          res.statusCode !== 200 ||
-          JSON.stringify(jsonData) !== JSON.stringify(EXPECTED_RESPONSE)
+          res.statusCode === 200 &&
+          JSON.stringify(jsonData) === JSON.stringify(EXPECTED_RESPONSE)
         ) {
-          consecutiveFailures++;
-          console.error(
-            `[${new Date().toISOString()}] Unexpected response (failure ${consecutiveFailures}/${MAX_FAILURES}):`,
-            res.statusCode,
-            jsonData
-          );
-          
-          if (consecutiveFailures >= MAX_FAILURES) {
-            restartPM2();
-          }
+          logCritical("INFO", "Health check passed", {
+            duration: `${healthCheckDuration}ms`,
+            status: res.statusCode,
+          });
+          healthCheckPassed = true;
         } else {
-          if (consecutiveFailures > 0) {
-            console.log(`[${new Date().toISOString()}] Health check recovered after ${consecutiveFailures} failures.`);
-          } else {
-            console.log(`[${new Date().toISOString()}] Health check passed.`);
-          }
-          consecutiveFailures = 0;
+          logCritical("ERROR", "Unexpected response from app", {
+            duration: `${healthCheckDuration}ms`,
+            statusCode: res.statusCode,
+            expected: EXPECTED_RESPONSE,
+            received: jsonData,
+          });
         }
       } catch (error) {
-        consecutiveFailures++;
-        console.error(
-          `[${new Date().toISOString()}] Error parsing response (failure ${consecutiveFailures}/${MAX_FAILURES}):`,
-          error.message,
-          "Data:",
-          data
-        );
-        
-        if (consecutiveFailures >= MAX_FAILURES) {
-          restartPM2();
-        }
+        logCritical("ERROR", "Error parsing app response", {
+          duration: `${healthCheckDuration}ms`,
+          error: error.message,
+          rawData: data,
+        });
       }
+
+      // After app check completes, perform DB check
+      performDbCheck();
     });
   });
 
-  req.on("error", (error) => {
-    consecutiveFailures++;
-    console.error(
-      `[${new Date().toISOString()}] Health check failed (failure ${consecutiveFailures}/${MAX_FAILURES}):`,
-      error.message
-    );
-    
-    if (consecutiveFailures >= MAX_FAILURES) {
-      restartPM2();
-    }
+  appReq.on("error", (error) => {
+    healthCheckDuration = Date.now() - appCheckStart;
+    logCritical("ERROR", "Health check request failed", {
+      duration: `${healthCheckDuration}ms`,
+      error: error.message,
+      code: error.code,
+    });
+    performDbCheck();
   });
 
-  req.on("timeout", () => {
-    consecutiveFailures++;
-    console.error(
-      `[${new Date().toISOString()}] Health check timed out (failure ${consecutiveFailures}/${MAX_FAILURES}).`
-    );
-    req.destroy();
-    
-    if (consecutiveFailures >= MAX_FAILURES) {
-      restartPM2();
-    }
+  appReq.on("timeout", () => {
+    healthCheckDuration = Date.now() - appCheckStart;
+    logCritical("ERROR", "Health check timed out", {
+      duration: `${healthCheckDuration}ms`,
+      timeout: options.timeout,
+    });
+    appReq.destroy();
+    performDbCheck();
   });
 
-  req.end();
-}
+  appReq.end();
 
-// Function to check database health
-function checkDatabaseHealth() {
-  return new Promise((resolve) => {
-    console.log(`[${new Date().toISOString()}] Checking database health at ${DB_HEALTH_URL}...`);
-
-    const url = new URL(DB_HEALTH_URL);
-    const options = {
-      hostname: url.hostname,
-      port: url.port || 3000,
-      path: url.pathname + url.search,
+  // Perform database health check
+  function performDbCheck() {
+    logCritical("INFO", `Checking database health at ${DB_HEALTH_URL}...`);
+    const dbCheckStart = Date.now();
+    const dbUrl = new URL(DB_HEALTH_URL);
+    const dbOptions = {
+      hostname: dbUrl.hostname,
+      port: dbUrl.port || 3000,
+      path: dbUrl.pathname + dbUrl.search,
       method: "GET",
       timeout: 10000,
     };
 
-    const req = http.request(options, (res) => {
+    const dbReq = http.request(dbOptions, (res) => {
       let data = "";
 
       res.on("data", (chunk) => {
@@ -150,86 +200,131 @@ function checkDatabaseHealth() {
       });
 
       res.on("end", () => {
+        dbCheckDuration = Date.now() - dbCheckStart;
+        
         try {
           const jsonData = JSON.parse(data);
 
-          if (res.statusCode !== 200 || jsonData.mongodb !== 'connected') {
-            console.error(
-              `[${new Date().toISOString()}] Database health check failed:`,
-              res.statusCode,
-              jsonData
-            );
-            resolve(false);
+          if (res.statusCode === 200 && jsonData.mongodb === 'connected') {
+            logCritical("INFO", "Database health check passed", {
+              duration: `${dbCheckDuration}ms`,
+              status: res.statusCode,
+              poolSize: jsonData.poolSize,
+              availableConnections: jsonData.availableConnections,
+            });
+            dbCheckPassed = true;
+            
+            // Warn if pool is low
+            if (jsonData.availableConnections < 10) {
+              logCritical("WARN", "Database connection pool running low", {
+                availableConnections: jsonData.availableConnections,
+                poolSize: jsonData.poolSize,
+              });
+            }
           } else {
-            console.log(
-              `[${new Date().toISOString()}] Database health check passed.`,
-              jsonData.poolSize ? `Pool: ${jsonData.poolSize} connections` : ''
-            );
-            resolve(true);
+            logCritical("ERROR", "Database unhealthy", {
+              duration: `${dbCheckDuration}ms`,
+              statusCode: res.statusCode,
+              mongodb: jsonData.mongodb,
+              error: jsonData.error,
+            });
           }
         } catch (error) {
-          console.error(
-            `[${new Date().toISOString()}] Error parsing DB health response:`,
-            error.message
-          );
-          resolve(false);
+          logCritical("ERROR", "Error parsing database response", {
+            duration: `${dbCheckDuration}ms`,
+            error: error.message,
+            rawData: data,
+          });
         }
+
+        // Finalize check after both complete
+        finalizeCheck();
       });
     });
 
-    req.on("error", (error) => {
-      console.error(
-        `[${new Date().toISOString()}] Database health check request failed:`,
-        error.message
-      );
-      resolve(false);
+    dbReq.on("error", (error) => {
+      dbCheckDuration = Date.now() - dbCheckStart;
+      logCritical("ERROR", "Database health check request failed", {
+        duration: `${dbCheckDuration}ms`,
+        error: error.message,
+        code: error.code,
+      });
+      finalizeCheck();
     });
 
-    req.on("timeout", () => {
-      console.error(`[${new Date().toISOString()}] Database health check timed out.`);
-      req.destroy();
-      resolve(false);
+    dbReq.on("timeout", () => {
+      dbCheckDuration = Date.now() - dbCheckStart;
+      logCritical("ERROR", "Database health check timed out", {
+        duration: `${dbCheckDuration}ms`,
+        timeout: dbOptions.timeout,
+      });
+      dbReq.destroy();
+      finalizeCheck();
     });
 
-    req.end();
-  });
-}
+    dbReq.end();
+  }
 
-// Combined health check
-async function performHealthCheck() {
-  console.log(`[${new Date().toISOString()}] === Starting health check ===`);
-  
-  // Check basic endpoint
-  checkHealth();
-  
-  // Also check database health
-  const dbHealthy = await checkDatabaseHealth();
-  
-  if (!dbHealthy) {
-    consecutiveFailures++;
-    console.error(
-      `[${new Date().toISOString()}] Database unhealthy (failure ${consecutiveFailures}/${MAX_FAILURES})`
-    );
-    
-    if (consecutiveFailures >= MAX_FAILURES) {
-      restartPM2();
+  // Finalize health check after both checks complete
+  function finalizeCheck() {
+    const totalDuration = Date.now() - checkStartTime;
+
+    if (!healthCheckPassed || !dbCheckPassed) {
+      consecutiveFailures++;
+      
+      logCritical("ERROR", "Overall health check failed", {
+        failure: `${consecutiveFailures}/${MAX_FAILURES}`,
+        healthCheckPassed,
+        dbCheckPassed,
+        healthCheckDuration: `${healthCheckDuration}ms`,
+        dbCheckDuration: `${dbCheckDuration}ms`,
+        totalDuration: `${totalDuration}ms`,
+      });
+
+      if (consecutiveFailures >= MAX_FAILURES) {
+        restartPM2();
+      }
+    } else {
+      if (consecutiveFailures > 0) {
+        logCritical("INFO", `Overall health check recovered after ${consecutiveFailures} failures`, {
+          totalDuration: `${totalDuration}ms`,
+        });
+      }
+      consecutiveFailures = 0;
     }
+
+    logCritical("INFO", "=== Health check completed ===", {
+      totalDuration: `${totalDuration}ms`,
+      consecutiveFailures,
+    });
   }
 }
 
-// Start health checking after initial delay
-console.log(`Health checker starting... will begin checks in ${INITIAL_DELAY/1000} seconds`);
+// Start the health checker after initial delay
+logCritical("INFO", `Health checker started. Waiting ${INITIAL_DELAY}ms before first check...`);
 setTimeout(() => {
-  console.log("Starting health checks...");
-  performHealthCheck();
-  setInterval(performHealthCheck, CHECK_INTERVAL);
+  logCritical("INFO", `Starting periodic health checks every ${CHECK_INTERVAL}ms...`);
+  
+  // Run first check immediately after initial delay
+  checkHealth();
+  
+  // Then run on interval
+  setInterval(checkHealth, CHECK_INTERVAL);
 }, INITIAL_DELAY);
 
-// Keep the process alive
+// Global error handlers
 process.on('uncaughtException', (error) => {
-  console.error(`[${new Date().toISOString()}] Uncaught exception:`, error);
+  logCritical("CRITICAL", "UNCAUGHT EXCEPTION", {
+    error: error.message,
+    stack: error.stack,
+  });
+  // Don't exit - let PM2 handle it
 });
 
 process.on('unhandledRejection', (reason, promise) => {
-  console.error(`[${new Date().toISOString()}] Unhandled rejection:`, reason);
+  logCritical("CRITICAL", "UNHANDLED REJECTION", {
+    reason: reason?.message || reason,
+    promise: promise.toString(),
+  });
 });
+
