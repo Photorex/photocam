@@ -49,7 +49,7 @@ function checkHealth() {
     port: url.port || 3000,
     path: url.pathname + url.search,
     method: "GET",
-    timeout: 5000,
+    timeout: 10000,
   };
 
   const req = http.request(options, (res) => {
@@ -139,7 +139,7 @@ function checkDatabaseHealth() {
       port: url.port || 3000,
       path: url.pathname + url.search,
       method: "GET",
-      timeout: 5000,
+      timeout: 10000,
     };
 
     const req = http.request(options, (res) => {
