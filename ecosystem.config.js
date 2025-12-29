@@ -3,9 +3,8 @@ module.exports = {
       {
         name: 'simcam',
         cwd: '/var/www/simcam/photo/simcam',
-        script: 'server-custom.js',
-        interpreter: 'node',
-        interpreter_args: '--max-old-space-size=4096', // 4GB heap for Next.js
+        script: 'start-with-heap.sh',
+        interpreter: 'bash',
         instances: 1,
         exec_mode: 'fork',
         max_memory_restart: '4G', // Restart if memory exceeds 4GB
