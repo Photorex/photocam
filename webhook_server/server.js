@@ -7,6 +7,15 @@ const path = require('path');
 const fetch = require('node-fetch');
 const { generateDefaultImageForModel } = require('./generateDefaultImageForLora');
 
+// Import security utilities
+const {
+  validateUploadedFile,
+  sanitizeId,
+  validatePathSafety,
+  cleanupFile,
+  ALLOWED_EXTENSIONS
+} = require('./security');
+
 // Mongoose model
 const Image = require('./imageModel');
 const User = require('./userModel');
@@ -95,24 +104,53 @@ app.post('/service/webhook/lora/image', (req, res) => {
 
   let responded = false; // track if we've sent a final response
 
+  let originalFilename = '';
+  let reportedMimeType = '';
+
   // This event is for regular form fields
   bb.on('field', (fieldName, val) => {
     console.log(`📝 field: ${fieldName} = ${val}`);
     if (fieldName === 'id_gen') {
-      id_gen = val.trim();
+      // Sanitize ID to prevent path traversal
+      const idValidation = sanitizeId(val, 'id_gen');
+      if (!idValidation.valid) {
+        console.error(`🚨 Security: ${idValidation.error}`);
+        if (!responded) {
+          responded = true;
+          return res.status(400).json({ error: idValidation.error });
+        }
+        return;
+      }
+      id_gen = idValidation.sanitizedId;
     }
   });
 
   // This event is for the actual file
   bb.on('file', (fieldName, fileStream, { filename, encoding, mimeType }) => {
-    console.log(`📦 file field=[${fieldName}] filename=[${filename}]`);
+    console.log(`📦 file field=[${fieldName}] filename=[${filename}] mimeType=[${mimeType}]`);
+    
+    originalFilename = filename;
+    reportedMimeType = mimeType || 'application/octet-stream';
     fileReceived = true;
 
-    // Derive extension
-    fileExt = path.extname(filename) || '.png';
+    // Only allow specific image extensions
+    const ext = path.extname(filename).toLowerCase();
+    if (!ALLOWED_EXTENSIONS.includes(ext)) {
+      console.error(`🚨 Security: Rejected file type ${ext}`);
+      fileStream.resume(); // Drain the stream
+      if (!responded) {
+        responded = true;
+        return res.status(400).json({ 
+          error: `File type ${ext} not allowed. Only ${ALLOWED_EXTENSIONS.join(', ')} are accepted.` 
+        });
+      }
+      return;
+    }
 
-    // We'll create a random TEMP file to store data as it streams
-    const tempName = `${id_gen}-${Date.now()}${fileExt}`;
+    fileExt = ext;
+
+    // Create temp file with secure random name
+    const tempName = `temp-${Date.now()}-${Math.random().toString(36).substring(7)}${fileExt}`;
     tempFilePath = path.join(uploadDir, tempName);
 
     console.log(`💾 Streaming to temp => ${tempFilePath}`);
@@ -145,19 +183,41 @@ app.post('/service/webhook/lora/image', (req, res) => {
     // Wait for the file to finish writing
     fileWriteStream.on('finish', async () => {
       try {
+        // SECURITY: Validate uploaded file
+        console.log('🔒 Running security validation...');
+        const validation = await validateUploadedFile(tempFilePath, originalFilename, reportedMimeType);
+        
+        if (!validation.valid) {
+          console.error('🚨 Security: File validation failed:', validation.errors);
+          cleanupFile(tempFilePath);
+          if (!responded) {
+            responded = true;
+            return res.status(400).json({ 
+              error: 'File validation failed',
+              details: validation.errors 
+            });
+          }
+          return;
+        }
+
+        console.log('✅ Security validation passed');
+
         // 1) Find the doc => get userId
         const imageDoc = await Image.findById(id_gen);
         if (!imageDoc) {
           console.warn(`No doc found for _id=${id_gen}`);
+          cleanupFile(tempFilePath);
           if (!responded) {
             responded = true;
             return res.status(200).json({ error: 'Image doc not found' });
           }
           return;
         }
+        
         const userId = imageDoc.userId;
         if (!userId) {
           console.warn('No userId in doc');
+          cleanupFile(tempFilePath);
           if (!responded) {
             responded = true;
             return res.status(200).json({ error: 'No userId in doc' });
@@ -165,20 +225,53 @@ app.post('/service/webhook/lora/image', (req, res) => {
           return;
         }
 
-        // 2) Create user folder if needed
-        const userFolder = path.join(uploadDir, userId.toString());
+        // Sanitize userId
+        const userIdValidation = sanitizeId(userId.toString(), 'userId');
+        if (!userIdValidation.valid) {
+          console.error(`🚨 Security: ${userIdValidation.error}`);
+          cleanupFile(tempFilePath);
+          if (!responded) {
+            responded = true;
+            return res.status(400).json({ error: userIdValidation.error });
+          }
+          return;
+        }
+
+        // 2) Validate path safety and create user folder
+        const pathCheck = validatePathSafety(uploadDir, userIdValidation.sanitizedId);
+        if (!pathCheck.valid) {
+          console.error(`🚨 Security: ${pathCheck.error}`);
+          cleanupFile(tempFilePath);
+          if (!responded) {
+            responded = true;
+            return res.status(400).json({ error: 'Path validation failed' });
+          }
+          return;
+        }
+
+        const userFolder = pathCheck.safePath;
         if (!fs.existsSync(userFolder)) {
           fs.mkdirSync(userFolder, { recursive: true });
           console.log('Created user folder =>', userFolder);
         }
 
-        // 3) final path => userId/<id_gen>.ext
-        const finalFilePath = path.join(userFolder, `${id_gen}${fileExt}`);
+        // 3) Validate final file path
+        const finalPathCheck = validatePathSafety(userFolder, `${id_gen}${fileExt}`);
+        if (!finalPathCheck.valid) {
+          console.error(`🚨 Security: ${finalPathCheck.error}`);
+          cleanupFile(tempFilePath);
+          if (!responded) {
+            responded = true;
+            return res.status(400).json({ error: 'Final path validation failed' });
+          }
+          return;
+        }
+
+        const finalFilePath = finalPathCheck.safePath;
         console.log(`📝 Renaming temp => ${finalFilePath}`);
         fs.renameSync(tempFilePath, finalFilePath);
 
         // 4) Update doc
-        //    res_image = "userId/id_gen.ext"
         const relativePath = path.join(userId.toString(), `${id_gen}${fileExt}`).replace(/\\/g, '/');
         imageDoc.res_image = relativePath;
         imageDoc.status = 'ready';
@@ -190,13 +283,14 @@ app.post('/service/webhook/lora/image', (req, res) => {
         if (!responded) {
           responded = true;
           return res.json({
-            message: 'File received & updated in user folder',
+            message: 'File received & validated successfully',
             id_gen,
             path: relativePath,
           });
         }
       } catch (err) {
         console.error('❌ Error finishing file update:', err);
+        cleanupFile(tempFilePath);
         if (!responded) {
           responded = true;
           return res.status(200).json({ error: err.message });
@@ -251,17 +345,47 @@ app.post('/service/webhook/gen/image', (req, res) => {
     let tempFilePath = '';
     let fileWriteStream;
     let responded = false;
+    let originalFilename = '';
+    let reportedMimeType = '';
   
     bb.on('field', (fieldName, val) => {
       console.log(`📝 field: ${fieldName} = ${val}`);
       fields[fieldName] = val;
-      if (fieldName === 'id_gen') id_gen = val.trim();
+      if (fieldName === 'id_gen') {
+        const idValidation = sanitizeId(val, 'id_gen');
+        if (!idValidation.valid) {
+          console.error(`🚨 Security: ${idValidation.error}`);
+          if (!responded) {
+            responded = true;
+            return res.status(400).json({ error: idValidation.error });
+          }
+          return;
+        }
+        id_gen = idValidation.sanitizedId;
+      }
     });
   
-    bb.on('file', (fieldName, fileStream, { filename }) => {
-      console.log(`📦 file field=[${fieldName}] filename=[${filename}]`);
-      fileExt = path.extname(filename) || '.png';
-      const tempName = `${id_gen}-${Date.now()}${fileExt}`;
+    bb.on('file', (fieldName, fileStream, { filename, mimeType }) => {
+      console.log(`📦 file field=[${fieldName}] filename=[${filename}] mimeType=[${mimeType}]`);
+      
+      originalFilename = filename;
+      reportedMimeType = mimeType || 'application/octet-stream';
+      
+      const ext = path.extname(filename).toLowerCase();
+      if (!ALLOWED_EXTENSIONS.includes(ext)) {
+        console.error(`🚨 Security: Rejected file type ${ext}`);
+        fileStream.resume();
+        if (!responded) {
+          responded = true;
+          return res.status(400).json({ 
+            error: `File type ${ext} not allowed. Only ${ALLOWED_EXTENSIONS.join(', ')} are accepted.` 
+          });
+        }
+        return;
+      }
+      
+      fileExt = ext;
+      const tempName = `temp-${Date.now()}-${Math.random().toString(36).substring(7)}${fileExt}`;
       tempFilePath = path.join(uploadDir, tempName);
   
       console.log(`💾 Streaming to temp => ${tempFilePath}`);
@@ -285,18 +409,77 @@ app.post('/service/webhook/gen/image', (req, res) => {
   
       fileWriteStream.on('finish', async () => {
         try {
+          // SECURITY: Validate uploaded file
+          console.log('🔒 Running security validation...');
+          const validation = await validateUploadedFile(tempFilePath, originalFilename, reportedMimeType);
+          
+          if (!validation.valid) {
+            console.error('🚨 Security: File validation failed:', validation.errors);
+            cleanupFile(tempFilePath);
+            if (!responded) {
+              responded = true;
+              return res.status(400).json({ 
+                error: 'File validation failed',
+                details: validation.errors 
+              });
+            }
+            return;
+          }
+
+          console.log('✅ Security validation passed');
+
           const imageDoc = await Image.findById(id_gen);
-          if (!imageDoc) throw new Error('Image doc not found');
+          if (!imageDoc) {
+            cleanupFile(tempFilePath);
+            throw new Error('Image doc not found');
+          }
+          
           const userId = imageDoc.userId;
-          if (!userId) throw new Error('No userId in doc');
+          if (!userId) {
+            cleanupFile(tempFilePath);
+            throw new Error('No userId in doc');
+          }
+
+          const userIdValidation = sanitizeId(userId.toString(), 'userId');
+          if (!userIdValidation.valid) {
+            console.error(`🚨 Security: ${userIdValidation.error}`);
+            cleanupFile(tempFilePath);
+            if (!responded) {
+              responded = true;
+              return res.status(400).json({ error: userIdValidation.error });
+            }
+            return;
+          }
   
-          const userFolder = path.join(uploadDir, userId.toString());
+          const pathCheck = validatePathSafety(uploadDir, userIdValidation.sanitizedId);
+          if (!pathCheck.valid) {
+            console.error(`🚨 Security: ${pathCheck.error}`);
+            cleanupFile(tempFilePath);
+            if (!responded) {
+              responded = true;
+              return res.status(400).json({ error: 'Path validation failed' });
+            }
+            return;
+          }
+
+          const userFolder = pathCheck.safePath;
           if (!fs.existsSync(userFolder)) {
             fs.mkdirSync(userFolder, { recursive: true });
             console.log('📁 Created user folder =>', userFolder);
           }
+
+          const finalPathCheck = validatePathSafety(userFolder, `${id_gen}${fileExt}`);
+          if (!finalPathCheck.valid) {
+            console.error(`🚨 Security: ${finalPathCheck.error}`);
+            cleanupFile(tempFilePath);
+            if (!responded) {
+              responded = true;
+              return res.status(400).json({ error: 'Final path validation failed' });
+            }
+            return;
+          }
   
-          const finalPath = path.join(userFolder, `${id_gen}${fileExt}`);
+          const finalPath = finalPathCheck.safePath;
           fs.renameSync(tempFilePath, finalPath);
           const relativePath = path.join(userId.toString(), `${id_gen}${fileExt}`).replace(/\\/g, '/');
   
@@ -314,13 +497,14 @@ app.post('/service/webhook/gen/image', (req, res) => {
           if (!responded) {
             responded = true;
             return res.json({
-              message: 'Image saved and metadata updated',
+              message: 'Image saved and metadata validated successfully',
               id_gen,
               path: relativePath,
             });
           }
         } catch (err) {
           console.error('❌ Error in webhook /gen/image:', err);
+          cleanupFile(tempFilePath);
           if (!responded) {
             responded = true;
             return res.status(200).json({ error: err.message });
@@ -372,14 +556,43 @@ app.post('/service/webhook/skin/default/image', (req, res) => {
     let fileExt = '.png';
     let fileWriteStream;
     let responded = false;
+    let originalFilename = '';
+    let reportedMimeType = '';
   
     bb.on('field', (fieldName, val) => {
-      if (fieldName === 'id_gen') id_gen = val.trim();
+      if (fieldName === 'id_gen') {
+        const idValidation = sanitizeId(val, 'id_gen');
+        if (!idValidation.valid) {
+          console.error(`🚨 Security: ${idValidation.error}`);
+          if (!responded) {
+            responded = true;
+            return res.status(400).json({ error: idValidation.error });
+          }
+          return;
+        }
+        id_gen = idValidation.sanitizedId;
+      }
     });
   
-    bb.on('file', (fieldName, fileStream, { filename }) => {
-      fileExt = path.extname(filename) || '.png';
-      const tempName = `${id_gen}-${Date.now()}${fileExt}`;
+    bb.on('file', (fieldName, fileStream, { filename, mimeType }) => {
+      originalFilename = filename;
+      reportedMimeType = mimeType || 'application/octet-stream';
+      
+      const ext = path.extname(filename).toLowerCase();
+      if (!ALLOWED_EXTENSIONS.includes(ext)) {
+        console.error(`🚨 Security: Rejected file type ${ext}`);
+        fileStream.resume();
+        if (!responded) {
+          responded = true;
+          return res.status(400).json({ 
+            error: `File type ${ext} not allowed. Only ${ALLOWED_EXTENSIONS.join(', ')} are accepted.` 
+          });
+        }
+        return;
+      }
+      
+      fileExt = ext;
+      const tempName = `temp-${Date.now()}-${Math.random().toString(36).substring(7)}${fileExt}`;
       tempFilePath = path.join(uploadDir, tempName);
   
       fileWriteStream = fs.createWriteStream(tempFilePath);
@@ -395,18 +608,76 @@ app.post('/service/webhook/skin/default/image', (req, res) => {
   
       fileWriteStream.on('finish', async () => {
         try {
+          // SECURITY: Validate uploaded file
+          console.log('🔒 Running security validation...');
+          const validation = await validateUploadedFile(tempFilePath, originalFilename, reportedMimeType);
+          
+          if (!validation.valid) {
+            console.error('🚨 Security: File validation failed:', validation.errors);
+            cleanupFile(tempFilePath);
+            if (!responded) {
+              responded = true;
+              return res.status(400).json({ 
+                error: 'File validation failed',
+                details: validation.errors 
+              });
+            }
+            return;
+          }
+
+          console.log('✅ Security validation passed');
+
           const user = await User.findOne({ 'modelMap.id_gen': id_gen });
-          if (!user) throw new Error('User not found with that model');
+          if (!user) {
+            cleanupFile(tempFilePath);
+            throw new Error('User not found with that model');
+          }
   
           const model = user.modelMap.find((m) => m.id_gen === id_gen);
-          if (!model) throw new Error('Model not found');
+          if (!model) {
+            cleanupFile(tempFilePath);
+            throw new Error('Model not found');
+          }
+
+          const userIdValidation = sanitizeId(user._id.toString(), 'userId');
+          if (!userIdValidation.valid) {
+            console.error(`🚨 Security: ${userIdValidation.error}`);
+            cleanupFile(tempFilePath);
+            if (!responded) {
+              responded = true;
+              return res.status(400).json({ error: userIdValidation.error });
+            }
+            return;
+          }
   
-          const userFolder = path.join(uploadDir, user._id.toString(), 'default');
+          const pathCheck = validatePathSafety(uploadDir, userIdValidation.sanitizedId, 'default');
+          if (!pathCheck.valid) {
+            console.error(`🚨 Security: ${pathCheck.error}`);
+            cleanupFile(tempFilePath);
+            if (!responded) {
+              responded = true;
+              return res.status(400).json({ error: 'Path validation failed' });
+            }
+            return;
+          }
+
+          const userFolder = pathCheck.safePath;
           if (!fs.existsSync(userFolder)) {
             fs.mkdirSync(userFolder, { recursive: true });
           }
+
+          const finalPathCheck = validatePathSafety(userFolder, `${id_gen}${fileExt}`);
+          if (!finalPathCheck.valid) {
+            console.error(`🚨 Security: ${finalPathCheck.error}`);
+            cleanupFile(tempFilePath);
+            if (!responded) {
+              responded = true;
+              return res.status(400).json({ error: 'Final path validation failed' });
+            }
+            return;
+          }
   
-          const finalPath = path.join(userFolder, `${id_gen}${fileExt}`);
+          const finalPath = finalPathCheck.safePath;
           fs.renameSync(tempFilePath, finalPath);
           const relativePath = path.join(user._id.toString(), 'default', `${id_gen}${fileExt}`).replace(/\\/g, '/');
   
@@ -416,10 +687,11 @@ app.post('/service/webhook/skin/default/image', (req, res) => {
           console.log(`✅ Model image saved: ${relativePath}`);
           if (!responded) {
             responded = true;
-            return res.status(200).json({ message: 'Model image saved', path: relativePath });
+            return res.status(200).json({ message: 'Model image validated and saved', path: relativePath });
           }
         } catch (err) {
           console.error('❌ Error in model image webhook:', err);
+          cleanupFile(tempFilePath);
           if (!responded) {
             responded = true;
             return res.status(200).json({ error: err.message });
