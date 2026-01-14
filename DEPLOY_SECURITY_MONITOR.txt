@@ -1,0 +1,82 @@
+╔════════════════════════════════════════════════════════════════╗
+║         Deploy Security Monitor to Server - Quick Guide        ║
+╚════════════════════════════════════════════════════════════════╝
+
+STEP 1: Upload Scripts from Windows
+════════════════════════════════════════════════════════════════
+From your Windows machine (current directory):
+
+scp security_monitor.sh install_security_monitor.sh dev2@your-server-ip:/var/www/simcam/photo/
+
+
+STEP 2: SSH to Server and Install
+════════════════════════════════════════════════════════════════
+ssh dev2@your-server-ip
+
+cd /var/www/simcam/photo
+chmod +x security_monitor.sh install_security_monitor.sh
+sudo ./install_security_monitor.sh
+
+
+STEP 3: Test Immediately
+════════════════════════════════════════════════════════════════
+# Run manual scan (safe, read-only)
+sudo /usr/local/bin/security_monitor.sh
+
+# If miners found, run with kill flag
+sudo /usr/local/bin/security_monitor.sh --kill-miners
+
+
+STEP 4: Verify Automatic Monitoring
+════════════════════════════════════════════════════════════════
+# Check cron job is active
+crontab -l | grep security_monitor
+
+# Check systemd timer
+sudo systemctl status security-monitor.timer
+
+# View live logs
+sudo tail -f /var/log/security_alerts.log
+
+
+WHAT IT DOES AUTOMATICALLY (Every 5 minutes):
+════════════════════════════════════════════════════════════════
+✓ Checks MongoDB - restarts if down
+✓ Checks nginx - kills zombies and restarts if down
+✓ Checks PM2 services
+✓ Scans for miner processes (linuxsys, ozrpdr, etc.)
+✓ Scans for miner files in /tmp, /var/crash, /dev/shm
+✓ Checks cron jobs for malicious entries
+✓ Checks .bashrc/.profile for injected code
+✓ Monitors network for mining pool connections
+✓ Scans upload directories for suspicious files
+
+
+QUICK COMMANDS:
+════════════════════════════════════════════════════════════════
+View all logs:       sudo tail -f /var/log/security_monitor.log
+View alerts only:    sudo tail -f /var/log/security_alerts.log
+Manual scan:         sudo /usr/local/bin/security_monitor.sh
+Kill miners:         sudo /usr/local/bin/security_monitor.sh --kill-miners
+Check services:      pm2 status && sudo systemctl status mongod nginx
+
+
+AFTER INSTALLATION:
+════════════════════════════════════════════════════════════════
+The script will automatically monitor and fix issues.
+You can sit back and monitor the alerts log:
+
+sudo tail -f /var/log/security_alerts.log
+
+Any critical issues will be logged there.
+
+
+INSTALL ON BOTH USERS (if needed):
+════════════════════════════════════════════════════════════════
+# Switch to dev1
+sudo su - dev1
+cd /var/www/simcam/photo
+sudo ./install_security_monitor.sh
+
+# The script works system-wide, so installing once is enough
+# But you can install for both users if you want redundancy
