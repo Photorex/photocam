@@ -65,7 +65,8 @@ export const UserContextProvider = ({ children }: { children: ReactNode }) => {
     if (session?.user?.id) {
       updateModelMap();
     }
-  }, [session?.user?.id, updateModelMap]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [session?.user?.id]); // Removed updateModelMap from deps to prevent loops
 
   return (
     <UserContext.Provider
