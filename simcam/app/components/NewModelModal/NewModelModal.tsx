@@ -145,15 +145,22 @@ export default function NewModelModal({ isOpen, onClose, gender, setGender, onTo
     }
 
     const handleTrainModel = async () => {
-        console.log("🎯 handleTrainModel called!");
-        console.log("🎯 Session:", session?.user?.id);
-        console.log("🎯 Files:", userModelTrainFiles.length);
-        console.log("🎯 Images:", userModelTrainImages.length);
-        console.log("🎯 Name:", name);
-        console.log("🎯 Age:", age);
+        try {
+            console.error("=".repeat(80));
+            console.error("🎯 handleTrainModel START");
+            console.error("🎯 Session exists:", !!session);
+            console.error("🎯 Session user:", session?.user?.id);
+            console.error("🎯 Files length:", userModelTrainFiles?.length ?? 'undefined');
+            console.error("🎯 Images length:", userModelTrainImages?.length ?? 'undefined');
+            console.error("🎯 Name:", name);
+            console.error("🎯 Age:", age);
+            console.error("=".repeat(80));
+        } catch (logError) {
+            console.error("❌ Error during initial logging:", logError);
+        }
 
         if (!session?.user) {
-            console.log("❌ No session user");
+            console.error("❌ No session user");
             toggleLoginModal();
             return;
         }
@@ -162,7 +169,7 @@ export default function NewModelModal({ isOpen, onClose, gender, setGender, onTo
         const hasRequiredImages = userModelTrainFiles.length === 10 || userModelTrainImages.length === 10;
         
         if (!hasRequiredImages || !name || !age || !session?.user?.id) {
-            console.log("❌ Validation failed:", {
+            console.error("❌ Validation failed:", {
                 files: userModelTrainFiles.length,
                 images: userModelTrainImages.length,
                 hasRequiredImages,
@@ -282,16 +289,16 @@ export default function NewModelModal({ isOpen, onClose, gender, setGender, onTo
             // Determine which files to use
             let filesToUpload: File[] = [];
             
-            console.log("📸 Files stored:", userModelTrainFiles.length);
-            console.log("📸 Blob URLs:", userModelTrainImages.length);
+            console.error("📸 Files stored:", userModelTrainFiles.length);
+            console.error("📸 Blob URLs:", userModelTrainImages.length);
             
             if (userModelTrainFiles.length === 10) {
                 // Use stored File objects (new method - works on mobile)
-                console.log("✅ Using stored File objects");
+                console.error("✅ Using stored File objects");
                 filesToUpload = userModelTrainFiles;
             } else if (userModelTrainImages.length === 10) {
                 // Fallback: Convert blob URLs to Files (old method - may fail on mobile)
-                console.log("⚠️ Converting blob URLs to Files (fallback)");
+                console.error("⚠️ Converting blob URLs to Files (fallback)");
                 try {
                     filesToUpload = await Promise.all(
                         userModelTrainImages.map(async (url, i) => {
@@ -299,6 +306,7 @@ export default function NewModelModal({ isOpen, onClose, gender, setGender, onTo
                             return new File([blob], `image_${i}.png`, { type: blob.type });
                         })
                     );
+                    console.error("✅ Blob conversion successful");
                 } catch (blobError) {
                     console.error("❌ Blob URL fetch failed:", blobError);
                     throw new Error("Failed to process images. Please re-upload and try again.");
@@ -308,36 +316,38 @@ export default function NewModelModal({ isOpen, onClose, gender, setGender, onTo
             }
         
             // Add files to FormData
+            console.error(`📦 Adding ${filesToUpload.length} files to FormData`);
             filesToUpload.forEach((file, i) => {
-                console.log(`  - File ${i}: ${file.name}, ${file.size} bytes, ${file.type}`);
+                console.error(`  - File ${i}: ${file.name}, ${file.size} bytes, ${file.type}`);
                 formData.append("images", file, `image_${i}.png`);
             });
         
             // Step 3: Send to training backend
-            console.log("🚀 Sending training request to /api/lora/train...");
+            console.error("🚀 Sending training request to /api/lora/train...");
             const res = await fetch("/api/lora/train", {
                 method: "POST",
                 body: formData,
             });
         
-            console.log("📡 Training response status:", res.status);
+            console.error("📡 Training response status:", res.status);
             const json = await res.json();
-            console.log("📡 Training response data:", json);
+            console.error("📡 Training response data:", JSON.stringify(json));
             
             if (!res.ok) throw new Error(json.error || "Training failed");
         
-            console.log("✅ Training triggered successfully:", json);
+            console.error("✅ Training triggered successfully:", JSON.stringify(json));
             
             await refreshUserSession();
 
             } catch (err) {
-                console.error("❌ Training error:", err);
-                console.error("❌ Error details:", {
-                    message: (err as Error).message,
-                    stack: (err as Error).stack,
-                    userModelTrainFiles: userModelTrainFiles.length,
-                    userModelTrainImages: userModelTrainImages.length
-                });
+                console.error("=".repeat(80));
+                console.error("❌ TRAINING ERROR CAUGHT");
+                console.error("❌ Error:", err);
+                console.error("❌ Error message:", (err as Error)?.message);
+                console.error("❌ Error stack:", (err as Error)?.stack);
+                console.error("❌ Files count:", userModelTrainFiles?.length);
+                console.error("❌ Images count:", userModelTrainImages?.length);
+                console.error("=".repeat(80));
                 
                 const addResponse = await fetch('/api/user/tokens/add', {
                     method: 'PUT',
@@ -621,14 +631,17 @@ export default function NewModelModal({ isOpen, onClose, gender, setGender, onTo
                             {userModelTrainImages.length === 10 && (
                                 <button
                                     className={styles.uploadButton}
-                                    onClick={() => {
-                                        if (session?.user) {
-                                            trackGtmEvent("train_model", {
-                                              ecommerce: { usid: session.user.id }
-                                            });
-                                            // console.log('train_model gtm sent');
+                                    onClick={async () => {
+                                        try {
+                                            if (session?.user) {
+                                                trackGtmEvent("train_model", {
+                                                  ecommerce: { usid: session.user.id }
+                                                });
+                                            }
+                                            await handleTrainModel();
+                                        } catch (error) {
+                                            console.error("🚨 Button click error:", error);
                                         }
-                                        handleTrainModel();
                                     }}
                                 >
                                     Train model
