@@ -145,13 +145,31 @@ export default function NewModelModal({ isOpen, onClose, gender, setGender, onTo
     }
 
     const handleTrainModel = async () => {
+        console.log("🎯 handleTrainModel called!");
+        console.log("🎯 Session:", session?.user?.id);
+        console.log("🎯 Files:", userModelTrainFiles.length);
+        console.log("🎯 Images:", userModelTrainImages.length);
+        console.log("🎯 Name:", name);
+        console.log("🎯 Age:", age);
 
         if (!session?.user) {
+            console.log("❌ No session user");
             toggleLoginModal();
             return;
         }
 
-        if (userModelTrainFiles.length !== 10 || !name || !age || !session?.user?.id) {
+        // Check if we have EITHER 10 files OR 10 image URLs
+        const hasRequiredImages = userModelTrainFiles.length === 10 || userModelTrainImages.length === 10;
+        
+        if (!hasRequiredImages || !name || !age || !session?.user?.id) {
+            console.log("❌ Validation failed:", {
+                files: userModelTrainFiles.length,
+                images: userModelTrainImages.length,
+                hasRequiredImages,
+                name,
+                age,
+                userId: session?.user?.id
+            });
             toast.error('Please fill all fields and upload exactly 10 images.', {
                 position: "top-right",
                 autoClose: 5000,
