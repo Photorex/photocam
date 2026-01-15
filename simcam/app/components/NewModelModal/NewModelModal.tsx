@@ -145,6 +145,8 @@ export default function NewModelModal({ isOpen, onClose, gender, setGender, onTo
     }
 
     const handleTrainModel = async () => {
+        alert(`START: Files=${userModelTrainFiles?.length}, Images=${userModelTrainImages?.length}, Name=${name}, Age=${age}`);
+        
         try {
             console.error("=".repeat(80));
             console.error("🎯 handleTrainModel START");
@@ -294,10 +296,12 @@ export default function NewModelModal({ isOpen, onClose, gender, setGender, onTo
             
             if (userModelTrainFiles.length === 10) {
                 // Use stored File objects (new method - works on mobile)
+                alert("✅ Using stored File objects");
                 console.error("✅ Using stored File objects");
                 filesToUpload = userModelTrainFiles;
             } else if (userModelTrainImages.length === 10) {
                 // Fallback: Convert blob URLs to Files (old method - may fail on mobile)
+                alert("⚠️ Converting blob URLs to Files (fallback)");
                 console.error("⚠️ Converting blob URLs to Files (fallback)");
                 try {
                     filesToUpload = await Promise.all(
@@ -306,12 +310,15 @@ export default function NewModelModal({ isOpen, onClose, gender, setGender, onTo
                             return new File([blob], `image_${i}.png`, { type: blob.type });
                         })
                     );
+                    alert("✅ Blob conversion successful");
                     console.error("✅ Blob conversion successful");
                 } catch (blobError) {
+                    alert("❌ Blob fetch failed: " + blobError);
                     console.error("❌ Blob URL fetch failed:", blobError);
                     throw new Error("Failed to process images. Please re-upload and try again.");
                 }
             } else {
+                alert("❌ No images available!");
                 throw new Error("No images available. Please upload 10 images.");
             }
         
@@ -340,6 +347,7 @@ export default function NewModelModal({ isOpen, onClose, gender, setGender, onTo
             await refreshUserSession();
 
             } catch (err) {
+                alert("❌ ERROR: " + (err as Error)?.message);
                 console.error("=".repeat(80));
                 console.error("❌ TRAINING ERROR CAUGHT");
                 console.error("❌ Error:", err);
