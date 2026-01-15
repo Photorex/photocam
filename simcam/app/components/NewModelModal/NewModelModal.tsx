@@ -368,27 +368,46 @@ export default function NewModelModal({ isOpen, onClose, gender, setGender, onTo
                 throw new Error("No images available. Please upload 10 images.");
             }
         
-            // Add files to FormData
+            // Add files to FormData with mobile-safe approach
             console.error(`📦 Adding ${filesToUpload.length} files to FormData`);
             try {
                 for (let i = 0; i < filesToUpload.length; i++) {
                     const file = filesToUpload[i];
+                    
+                    // Validate file is actually valid
+                    if (!file || !file.size || !file.type) {
+                        toast.error(`❌ File ${i} is invalid: size=${file?.size}, type=${file?.type}`, {
+                            position: "top-center",
+                            autoClose: 5000,
+                            theme: "dark",
+                        });
+                        throw new Error(`File ${i} is corrupted or invalid`);
+                    }
+                    
                     console.error(`  - File ${i}: ${file.name}, ${file.size} bytes, ${file.type}`);
-                    // Use file AS-IS without renaming - mobile browsers fail with custom names
-                    formData.append("images", file);
+                    
+                    // On mobile, create a new Blob from the File then a new File from that Blob
+                    // This fixes mobile browser File object issues
+                    const blob = new Blob([file], { type: file.type });
+                    const cleanFile = new File([blob], `image_${i}.png`, { 
+                        type: file.type,
+                        lastModified: Date.now()
+                    });
+                    
+                    formData.append("images", cleanFile);
                 }
-                toast.success(`✅ ${filesToUpload.length} files added`, {
+                toast.success(`✅ ${filesToUpload.length} files ready`, {
                     position: "top-center",
                     autoClose: 2000,
                     theme: "dark",
                 });
             } catch (appendError) {
-                toast.error(`❌ Failed to add files: ${(appendError as Error).message}`, {
+                toast.error(`❌ File prep failed: ${(appendError as Error).message}`, {
                     position: "top-center",
                     autoClose: 5000,
                     theme: "dark",
                 });
-                throw new Error(`Failed to append files: ${(appendError as Error).message}`);
+                throw new Error(`Failed to prepare files: ${(appendError as Error).message}`);
             }
         
             // Step 3: Send to training backend
