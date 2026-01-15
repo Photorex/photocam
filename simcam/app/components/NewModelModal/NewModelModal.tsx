@@ -260,7 +260,8 @@ export default function NewModelModal({ isOpen, onClose, gender, setGender, onTo
             }
             //   setIsTrainingLoading(true);
             eventBus.dispatchEvent(new Event("generation-lora-start"));
-            handleClose();
+            // DON'T close modal yet - we need the files!
+            // handleClose(); // MOVED TO END
         
                 const { ObjectId } = await import('bson');
                 const id_gen = new ObjectId().toHexString();
@@ -385,8 +386,11 @@ export default function NewModelModal({ isOpen, onClose, gender, setGender, onTo
                 theme: "dark",
             });
             console.error("✅ Training triggered successfully:", JSON.stringify(json));
-            
+
             await refreshUserSession();
+            
+            // NOW close the modal after everything succeeded
+            handleClose();
 
             } catch (err) {
                 const errorMsg = (err as Error)?.message || "Unknown error";
