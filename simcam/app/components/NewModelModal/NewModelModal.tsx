@@ -261,25 +261,66 @@ export default function NewModelModal({ isOpen, onClose, gender, setGender, onTo
             formData.append("age", age);
             formData.append("gender", genderLabel);
         
-            // Use the stored File objects directly (works on both desktop and mobile)
-            userModelTrainFiles.forEach((file, i) => {
+            // Determine which files to use
+            let filesToUpload: File[] = [];
+            
+            console.log("📸 Files stored:", userModelTrainFiles.length);
+            console.log("📸 Blob URLs:", userModelTrainImages.length);
+            
+            if (userModelTrainFiles.length === 10) {
+                // Use stored File objects (new method - works on mobile)
+                console.log("✅ Using stored File objects");
+                filesToUpload = userModelTrainFiles;
+            } else if (userModelTrainImages.length === 10) {
+                // Fallback: Convert blob URLs to Files (old method - may fail on mobile)
+                console.log("⚠️ Converting blob URLs to Files (fallback)");
+                try {
+                    filesToUpload = await Promise.all(
+                        userModelTrainImages.map(async (url, i) => {
+                            const blob = await fetch(url).then(res => res.blob());
+                            return new File([blob], `image_${i}.png`, { type: blob.type });
+                        })
+                    );
+                } catch (blobError) {
+                    console.error("❌ Blob URL fetch failed:", blobError);
+                    throw new Error("Failed to process images. Please re-upload and try again.");
+                }
+            } else {
+                throw new Error("No images available. Please upload 10 images.");
+            }
+        
+            // Add files to FormData
+            filesToUpload.forEach((file, i) => {
+                console.log(`  - File ${i}: ${file.name}, ${file.size} bytes, ${file.type}`);
                 formData.append("images", file, `image_${i}.png`);
             });
         
             // Step 3: Send to training backend
+            console.log("🚀 Sending training request to /api/lora/train...");
             const res = await fetch("/api/lora/train", {
                 method: "POST",
                 body: formData,
             });
         
+            console.log("📡 Training response status:", res.status);
             const json = await res.json();
+            console.log("📡 Training response data:", json);
+            
             if (!res.ok) throw new Error(json.error || "Training failed");
         
-            console.log("Training triggered:", json);
+            console.log("✅ Training triggered successfully:", json);
             
             await refreshUserSession();
 
             } catch (err) {
+                console.error("❌ Training error:", err);
+                console.error("❌ Error details:", {
+                    message: (err as Error).message,
+                    stack: (err as Error).stack,
+                    userModelTrainFiles: userModelTrainFiles.length,
+                    userModelTrainImages: userModelTrainImages.length
+                });
+                
                 const addResponse = await fetch('/api/user/tokens/add', {
                     method: 'PUT',
                     headers: {
@@ -289,15 +330,18 @@ export default function NewModelModal({ isOpen, onClose, gender, setGender, onTo
                 });
     
                 const addData = await addResponse.json();
-                // console.log('addData', addData);
+                console.log('💰 Token refund:', addData);
                     
                 if (addData.message !== 'User credits updated successfully') throw new Error(addData.message);
                     
                 // Update session with new token count
                 await update({ user: { ...session?.user, credits: addData.newTokenCount } });
                 
-                console.error("❌ Training error:", err);
-                toast.error(`Model training failed: ${(err as Error).message}`);
+                toast.error(`Model training failed: ${(err as Error).message}`, {
+                    position: "top-right",
+                    autoClose: 5000,
+                    theme: "dark",
+                });
             } finally {
             //   setIsTrainingLoading(false);
             }
