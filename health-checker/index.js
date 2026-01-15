@@ -12,7 +12,7 @@ const MAX_FAILURES = 3; // Allow 3 consecutive failures before restarting
 const EXPECTED_RESPONSE = { status: "ok", message: "Test route working" };
 
 // Logging configuration
-const LOG_DIR = "/home/dev2/.pm2/logs/critical";
+const LOG_DIR = "/home/dev1/.pm2/logs/critical";
 const LOG_FILE = path.join(LOG_DIR, "health-checker-critical.log");
 
 // Ensure log directory exists
