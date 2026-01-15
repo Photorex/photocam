@@ -167,43 +167,59 @@ export default function PhotoshootControls({
         const interval = setInterval(async () => {
           console.error("🔄 Polling for model updates...");
           await updateModelMap();
+          
+          // Get fresh user data to check status
+          if (!session?.user?.id) return;
+          
+          try {
+            const response = await fetch(`/api/user/${session.user.id}`, {
+              method: 'GET',
+              headers: { 'Content-Type': 'application/json' },
+            });
+            
+            const data = await response.json();
+            
+            if (response.ok) {
+              const freshModelMap = data.user.modelMap || [];
+              
+              // Process model map data
+              freshModelMap.forEach((model: any) => {
+                if (model.status === "ready") {
+                  const id = model.id_gen || model._id || model.name_lora;
+                  if (!reportedReadyModels.current.has(id)) {
+                    trackGtmEvent("added_model", {
+                      ecommerce: { usid: session?.user?.id }
+                    });
+                    reportedReadyModels.current.add(id);
+                  }
+                }
+              });
+          
+              // Check if still training
+              const stillTraining = freshModelMap.some(
+                (m: any) => m.status === "generating" || (m.status === "ready" && !m.model_image)
+              );
+          
+              if (!stillTraining) {
+                console.error("✅ All models ready with images, stopping polling");
+                setIsLoraTraining(false);
+                clearInterval(interval);
+              } else {
+                const generating = freshModelMap.filter((m: any) => m.status === "generating").length;
+                const waitingImage = freshModelMap.filter((m: any) => m.status === "ready" && !m.model_image).length;
+                console.error(`⏳ Still training: ${generating} generating, ${waitingImage} waiting for image`);
+              }
+            }
+          } catch (err) {
+            console.error("❌ Error checking model status:", err);
+          }
         }, 10000);
       
         return () => {
           console.error("🛑 Stopping LoRA training polling");
           clearInterval(interval);
         };
-    }, [isLoraTraining, updateModelMap]);
-    
-    // Separate effect to check when training is complete
-    useEffect(() => {
-        if (!isLoraTraining) return;
-        
-        // Process model map data
-        modelMap.forEach((model) => {
-          if (model.status === "ready") {
-            const id = model.id_gen || model._id || model.name_lora;
-            if (!reportedReadyModels.current.has(id)) {
-              trackGtmEvent("added_model", {
-                ecommerce: { usid: session?.user?.id }
-              });
-              reportedReadyModels.current.add(id);
-            }
-          }
-        });
-    
-        // Check if still training
-        const stillTraining = modelMap.some(
-          (m) => m.status === "generating" || (m.status === "ready" && !m.model_image)
-        );
-    
-        if (!stillTraining) {
-          console.error("✅ All models ready with images, stopping polling");
-          setIsLoraTraining(false);
-        } else {
-          console.error(`⏳ Still training: ${modelMap.filter(m => m.status === "generating").length} generating, ${modelMap.filter(m => m.status === "ready" && !m.model_image).length} waiting for image`);
-        }
-    }, [isLoraTraining, modelMap, session?.user?.id]);
+    }, [isLoraTraining, updateModelMap, session?.user?.id]);
 
     const handleReset = () => {
         resetToDefault();
