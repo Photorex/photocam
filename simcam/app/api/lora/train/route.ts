@@ -15,6 +15,7 @@ import { validateImageFiles, sanitizeId, sanitizeString } from "@/app/lib/securi
 //   type SubKey = keyof typeof LIMITS;
 
 export async function POST(req: Request) {
+  console.error("🚨🚨🚨 /api/lora/train POST RECEIVED 🚨🚨🚨");
   console.error("=".repeat(80));
   console.error("🎯 /api/lora/train POST RECEIVED");
   console.error("=".repeat(80));
@@ -22,6 +23,7 @@ export async function POST(req: Request) {
   try {
     const formData = await req.formData();
     console.error("📦 FormData received, parsing...");
+    console.error("📦 FormData entries:", Array.from(formData.keys()).join(", "));
     
     // Extract and validate all input fields
     const userId = formData.get("userId")?.toString();

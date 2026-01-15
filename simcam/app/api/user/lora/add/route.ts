@@ -3,7 +3,9 @@ import { connectMongoDB } from "@/app/lib/mongodb/mongodb";
 import User from "@/app/lib/mongodb/models/user";
 
 export async function POST(req: Request) {
+    console.error("🚨🚨🚨 /api/user/lora/add POST RECEIVED 🚨🚨🚨");
     const { userId, id_gen, name_lora, name, age, gender } = await req.json();
+    console.error("📦 Data:", { userId, id_gen, name_lora, name, age, gender });
 
     if (!userId || !id_gen || !name_lora || !name || !age || !gender) {
         return NextResponse.json({ error: "Missing fields" }, { status: 400 });

@@ -145,7 +145,11 @@ export default function NewModelModal({ isOpen, onClose, gender, setGender, onTo
     }
 
     const handleTrainModel = async () => {
-        alert(`START: Files=${userModelTrainFiles?.length}, Images=${userModelTrainImages?.length}, Name=${name}, Age=${age}`);
+        toast.info(`START: Files=${userModelTrainFiles?.length}, Images=${userModelTrainImages?.length}`, {
+            position: "top-center",
+            autoClose: 3000,
+            theme: "dark",
+        });
         
         try {
             console.error("=".repeat(80));
@@ -296,12 +300,20 @@ export default function NewModelModal({ isOpen, onClose, gender, setGender, onTo
             
             if (userModelTrainFiles.length === 10) {
                 // Use stored File objects (new method - works on mobile)
-                alert("✅ Using stored File objects");
+                toast.success("✅ Using stored File objects", {
+                    position: "top-center",
+                    autoClose: 2000,
+                    theme: "dark",
+                });
                 console.error("✅ Using stored File objects");
                 filesToUpload = userModelTrainFiles;
             } else if (userModelTrainImages.length === 10) {
                 // Fallback: Convert blob URLs to Files (old method - may fail on mobile)
-                alert("⚠️ Converting blob URLs to Files (fallback)");
+                toast.warning("⚠️ Converting blob URLs (fallback method)", {
+                    position: "top-center",
+                    autoClose: 3000,
+                    theme: "dark",
+                });
                 console.error("⚠️ Converting blob URLs to Files (fallback)");
                 try {
                     filesToUpload = await Promise.all(
@@ -310,15 +322,27 @@ export default function NewModelModal({ isOpen, onClose, gender, setGender, onTo
                             return new File([blob], `image_${i}.png`, { type: blob.type });
                         })
                     );
-                    alert("✅ Blob conversion successful");
+                    toast.success("✅ Blob conversion successful", {
+                        position: "top-center",
+                        autoClose: 2000,
+                        theme: "dark",
+                    });
                     console.error("✅ Blob conversion successful");
                 } catch (blobError) {
-                    alert("❌ Blob fetch failed: " + blobError);
+                    toast.error("❌ Blob fetch failed: " + (blobError as Error).message, {
+                        position: "top-center",
+                        autoClose: 5000,
+                        theme: "dark",
+                    });
                     console.error("❌ Blob URL fetch failed:", blobError);
                     throw new Error("Failed to process images. Please re-upload and try again.");
                 }
             } else {
-                alert("❌ No images available!");
+                toast.error("❌ No images available!", {
+                    position: "top-center",
+                    autoClose: 3000,
+                    theme: "dark",
+                });
                 throw new Error("No images available. Please upload 10 images.");
             }
         
@@ -330,24 +354,47 @@ export default function NewModelModal({ isOpen, onClose, gender, setGender, onTo
             });
         
             // Step 3: Send to training backend
+            toast.info("🚀 Sending training request...", {
+                position: "top-center",
+                autoClose: 2000,
+                theme: "dark",
+            });
             console.error("🚀 Sending training request to /api/lora/train...");
+            
             const res = await fetch("/api/lora/train", {
                 method: "POST",
                 body: formData,
             });
-        
+
             console.error("📡 Training response status:", res.status);
             const json = await res.json();
             console.error("📡 Training response data:", JSON.stringify(json));
             
-            if (!res.ok) throw new Error(json.error || "Training failed");
-        
+            if (!res.ok) {
+                toast.error(`❌ Server error: ${json.error}`, {
+                    position: "top-center",
+                    autoClose: 5000,
+                    theme: "dark",
+                });
+                throw new Error(json.error || "Training failed");
+            }
+
+            toast.success("✅ Training started successfully!", {
+                position: "top-center",
+                autoClose: 3000,
+                theme: "dark",
+            });
             console.error("✅ Training triggered successfully:", JSON.stringify(json));
             
             await refreshUserSession();
 
             } catch (err) {
-                alert("❌ ERROR: " + (err as Error)?.message);
+                const errorMsg = (err as Error)?.message || "Unknown error";
+                toast.error(`❌ ERROR: ${errorMsg}`, {
+                    position: "top-center",
+                    autoClose: 5000,
+                    theme: "dark",
+                });
                 console.error("=".repeat(80));
                 console.error("❌ TRAINING ERROR CAUGHT");
                 console.error("❌ Error:", err);
