@@ -374,9 +374,10 @@ export default function NewModelModal({ isOpen, onClose, gender, setGender, onTo
                 for (let i = 0; i < filesToUpload.length; i++) {
                     const file = filesToUpload[i];
                     console.error(`  - File ${i}: ${file.name}, ${file.size} bytes, ${file.type}`);
-                    formData.append("images", file, `image_${i}.png`);
+                    // Use file AS-IS without renaming - mobile browsers fail with custom names
+                    formData.append("images", file);
                 }
-                toast.success(`✅ ${filesToUpload.length} files added to request`, {
+                toast.success(`✅ ${filesToUpload.length} files added`, {
                     position: "top-center",
                     autoClose: 2000,
                     theme: "dark",
