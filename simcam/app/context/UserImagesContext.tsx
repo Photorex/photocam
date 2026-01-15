@@ -81,7 +81,7 @@ export const UserImagesProvider = ({ children }: { children: ReactNode }) => {
       setImages(unique);
       return unique;
     } catch (err) {
-      console.error('Error refetching images:', err);
+      // Silently handle - not an error if user has no images
       return [];
     } finally {
       setLoading(false);

@@ -145,28 +145,7 @@ export default function NewModelModal({ isOpen, onClose, gender, setGender, onTo
     }
 
     const handleTrainModel = async () => {
-        toast.info(`START: Files=${userModelTrainFiles?.length}, Images=${userModelTrainImages?.length}`, {
-            position: "top-center",
-            autoClose: 3000,
-            theme: "dark",
-        });
-        
-        try {
-            console.error("=".repeat(80));
-            console.error("🎯 handleTrainModel START");
-            console.error("🎯 Session exists:", !!session);
-            console.error("🎯 Session user:", session?.user?.id);
-            console.error("🎯 Files length:", userModelTrainFiles?.length ?? 'undefined');
-            console.error("🎯 Images length:", userModelTrainImages?.length ?? 'undefined');
-            console.error("🎯 Name:", name);
-            console.error("🎯 Age:", age);
-            console.error("=".repeat(80));
-        } catch (logError) {
-            console.error("❌ Error during initial logging:", logError);
-        }
-
         if (!session?.user) {
-            console.error("❌ No session user");
             toggleLoginModal();
             return;
         }
@@ -175,14 +154,6 @@ export default function NewModelModal({ isOpen, onClose, gender, setGender, onTo
         const hasRequiredImages = userModelTrainFiles.length === 10 || userModelTrainImages.length === 10;
         
         if (!hasRequiredImages || !name || !age || !session?.user?.id) {
-            console.error("❌ Validation failed:", {
-                files: userModelTrainFiles.length,
-                images: userModelTrainImages.length,
-                hasRequiredImages,
-                name,
-                age,
-                userId: session?.user?.id
-            });
             toast.error('Please fill all fields and upload exactly 10 images.', {
                 position: "top-right",
                 autoClose: 5000,
@@ -219,7 +190,6 @@ export default function NewModelModal({ isOpen, onClose, gender, setGender, onTo
 
         const isFirstCustomModel = await userStillHasFreeModel(session.user.id);
         const TOKEN_COST = isFirstCustomModel ? 0 : 50;
-        console.log('TOKEN_COST', TOKEN_COST);
 
         if ((session?.user?.credits ?? 0) < TOKEN_COST) {
             if (onToggle) {
@@ -306,37 +276,11 @@ export default function NewModelModal({ isOpen, onClose, gender, setGender, onTo
             // Determine which files to use
             let filesToUpload: File[] = [];
             
-            console.error("📸 Files stored:", userModelTrainFiles.length);
-            console.error("📸 Blob URLs:", userModelTrainImages.length);
-            
             if (userModelTrainFiles.length === 10) {
                 // Use stored File objects (new method - works on mobile)
-                // Validate they are actually File objects
-                const allAreFiles = userModelTrainFiles.every(f => f instanceof File);
-                if (!allAreFiles) {
-                    toast.error("❌ Stored files are corrupted! Please re-upload.", {
-                        position: "top-center",
-                        autoClose: 5000,
-                        theme: "dark",
-                    });
-                    throw new Error("Stored files are not valid File objects");
-                }
-                
-                toast.success("✅ Using stored File objects", {
-                    position: "top-center",
-                    autoClose: 2000,
-                    theme: "dark",
-                });
-                console.error("✅ Using stored File objects");
                 filesToUpload = userModelTrainFiles;
             } else if (userModelTrainImages.length === 10) {
                 // Fallback: Convert blob URLs to Files (old method - may fail on mobile)
-                toast.warning("⚠️ Converting blob URLs (fallback method)", {
-                    position: "top-center",
-                    autoClose: 3000,
-                    theme: "dark",
-                });
-                console.error("⚠️ Converting blob URLs to Files (fallback)");
                 try {
                     filesToUpload = await Promise.all(
                         userModelTrainImages.map(async (url, i) => {
@@ -344,47 +288,17 @@ export default function NewModelModal({ isOpen, onClose, gender, setGender, onTo
                             return new File([blob], `image_${i}.png`, { type: blob.type });
                         })
                     );
-                    toast.success("✅ Blob conversion successful", {
-                        position: "top-center",
-                        autoClose: 2000,
-                        theme: "dark",
-                    });
-                    console.error("✅ Blob conversion successful");
                 } catch (blobError) {
-                    toast.error("❌ Blob fetch failed: " + (blobError as Error).message, {
-                        position: "top-center",
-                        autoClose: 5000,
-                        theme: "dark",
-                    });
-                    console.error("❌ Blob URL fetch failed:", blobError);
                     throw new Error("Failed to process images. Please re-upload and try again.");
                 }
             } else {
-                toast.error("❌ No images available!", {
-                    position: "top-center",
-                    autoClose: 3000,
-                    theme: "dark",
-                });
                 throw new Error("No images available. Please upload 10 images.");
             }
         
             // Add files to FormData with mobile-safe approach
-            console.error(`📦 Adding ${filesToUpload.length} files to FormData`);
             try {
                 for (let i = 0; i < filesToUpload.length; i++) {
                     const file = filesToUpload[i];
-                    
-                    // Validate file is actually valid
-                    if (!file || !file.size || !file.type) {
-                        toast.error(`❌ File ${i} is invalid: size=${file?.size}, type=${file?.type}`, {
-                            position: "top-center",
-                            autoClose: 5000,
-                            theme: "dark",
-                        });
-                        throw new Error(`File ${i} is corrupted or invalid`);
-                    }
-                    
-                    console.error(`  - File ${i}: ${file.name}, ${file.size} bytes, ${file.type}`);
                     
                     // On mobile, create a new Blob from the File then a new File from that Blob
                     // This fixes mobile browser File object issues
@@ -396,52 +310,21 @@ export default function NewModelModal({ isOpen, onClose, gender, setGender, onTo
                     
                     formData.append("images", cleanFile);
                 }
-                toast.success(`✅ ${filesToUpload.length} files ready`, {
-                    position: "top-center",
-                    autoClose: 2000,
-                    theme: "dark",
-                });
             } catch (appendError) {
-                toast.error(`❌ File prep failed: ${(appendError as Error).message}`, {
-                    position: "top-center",
-                    autoClose: 5000,
-                    theme: "dark",
-                });
                 throw new Error(`Failed to prepare files: ${(appendError as Error).message}`);
             }
         
             // Step 3: Send to training backend
-            toast.info("🚀 Sending training request...", {
-                position: "top-center",
-                autoClose: 2000,
-                theme: "dark",
-            });
-            console.error("🚀 Sending training request to /api/lora/train...");
-            
             const res = await fetch("/api/lora/train", {
                 method: "POST",
                 body: formData,
             });
 
-            console.error("📡 Training response status:", res.status);
             const json = await res.json();
-            console.error("📡 Training response data:", JSON.stringify(json));
             
             if (!res.ok) {
-                toast.error(`❌ Server error: ${json.error}`, {
-                    position: "top-center",
-                    autoClose: 5000,
-                    theme: "dark",
-                });
                 throw new Error(json.error || "Training failed");
             }
-
-            toast.success("✅ Training started successfully!", {
-                position: "top-center",
-                autoClose: 3000,
-                theme: "dark",
-            });
-            console.error("✅ Training triggered successfully:", JSON.stringify(json));
 
             await refreshUserSession();
             
@@ -449,20 +332,6 @@ export default function NewModelModal({ isOpen, onClose, gender, setGender, onTo
             handleClose();
 
             } catch (err) {
-                const errorMsg = (err as Error)?.message || "Unknown error";
-                toast.error(`❌ ERROR: ${errorMsg}`, {
-                    position: "top-center",
-                    autoClose: 5000,
-                    theme: "dark",
-                });
-                console.error("=".repeat(80));
-                console.error("❌ TRAINING ERROR CAUGHT");
-                console.error("❌ Error:", err);
-                console.error("❌ Error message:", (err as Error)?.message);
-                console.error("❌ Error stack:", (err as Error)?.stack);
-                console.error("❌ Files count:", userModelTrainFiles?.length);
-                console.error("❌ Images count:", userModelTrainImages?.length);
-                console.error("=".repeat(80));
                 
                 const addResponse = await fetch('/api/user/tokens/add', {
                     method: 'PUT',
@@ -473,7 +342,6 @@ export default function NewModelModal({ isOpen, onClose, gender, setGender, onTo
                 });
     
                 const addData = await addResponse.json();
-                console.log('💰 Token refund:', addData);
                     
                 if (addData.message !== 'User credits updated successfully') throw new Error(addData.message);
                     

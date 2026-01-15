@@ -21,7 +21,13 @@ export interface ImageMetadata {
     });
   
     if (!res.ok) {
-      console.error(await res.text());
+      // Silently return empty array if no images found (normal for new users)
+      if (res.status === 404) {
+        return [];
+      }
+      // Only log actual errors
+      const text = await res.text();
+      console.error('Error fetching images:', text);
       throw new Error('Failed to fetch images');
     }
   

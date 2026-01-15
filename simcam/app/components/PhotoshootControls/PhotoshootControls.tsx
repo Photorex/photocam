@@ -161,11 +161,8 @@ export default function PhotoshootControls({
 
     useEffect(() => {
         if (!isLoraTraining) return;
-      
-        console.error("🔄 Starting LoRA training polling...");
         
         const interval = setInterval(async () => {
-          console.error("🔄 Polling for model updates...");
           await updateModelMap();
           
           // Get fresh user data to check status
@@ -201,22 +198,16 @@ export default function PhotoshootControls({
               );
           
               if (!stillTraining) {
-                console.error("✅ All models ready with images, stopping polling");
                 setIsLoraTraining(false);
                 clearInterval(interval);
-              } else {
-                const generating = freshModelMap.filter((m: any) => m.status === "generating").length;
-                const waitingImage = freshModelMap.filter((m: any) => m.status === "ready" && !m.model_image).length;
-                console.error(`⏳ Still training: ${generating} generating, ${waitingImage} waiting for image`);
               }
             }
           } catch (err) {
-            console.error("❌ Error checking model status:", err);
+            // Silently handle errors during polling
           }
         }, 10000);
       
         return () => {
-          console.error("🛑 Stopping LoRA training polling");
           clearInterval(interval);
         };
     }, [isLoraTraining, updateModelMap, session?.user?.id]);

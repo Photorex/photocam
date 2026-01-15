@@ -61,7 +61,7 @@ export const UserVideosProvider = ({ children }: { children: ReactNode }) => {
       setVideos((prev) => uniqueById([...prev, ...next]));
       setPage((p) => p + 1);
     } catch (err) {
-      console.error('Error fetching more user videos:', err);
+      // Silently handle - not an error if user has no videos
     } finally {
       setLoading(false);
     }
@@ -82,7 +82,7 @@ export const UserVideosProvider = ({ children }: { children: ReactNode }) => {
       setVideos(unique);
       return unique;
     } catch (err) {
-      console.error('Error refetching videos:', err);
+      // Silently handle - not an error if user has no videos
       return [];
     } finally {
       setLoading(false);
