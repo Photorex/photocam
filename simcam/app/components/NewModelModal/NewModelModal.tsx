@@ -285,13 +285,23 @@ export default function NewModelModal({ isOpen, onClose, gender, setGender, onTo
             });
         
             // Step 2: Prepare image FormData for training
-            const formData = new FormData();
-            formData.append("userId", session.user.id);
-            formData.append("id_gen", id_gen);
-            formData.append("name_lora", name_lora);
-            formData.append("name", name);
-            formData.append("age", age);
-            formData.append("gender", genderLabel);
+            let formData;
+            try {
+                formData = new FormData();
+                formData.append("userId", session.user.id);
+                formData.append("id_gen", id_gen);
+                formData.append("name_lora", name_lora);
+                formData.append("name", name);
+                formData.append("age", age);
+                formData.append("gender", genderLabel);
+            } catch (formError) {
+                toast.error(`❌ FormData creation failed: ${(formError as Error).message}`, {
+                    position: "top-center",
+                    autoClose: 5000,
+                    theme: "dark",
+                });
+                throw new Error(`FormData creation failed: ${(formError as Error).message}`);
+            }
         
             // Determine which files to use
             let filesToUpload: File[] = [];
@@ -301,6 +311,17 @@ export default function NewModelModal({ isOpen, onClose, gender, setGender, onTo
             
             if (userModelTrainFiles.length === 10) {
                 // Use stored File objects (new method - works on mobile)
+                // Validate they are actually File objects
+                const allAreFiles = userModelTrainFiles.every(f => f instanceof File);
+                if (!allAreFiles) {
+                    toast.error("❌ Stored files are corrupted! Please re-upload.", {
+                        position: "top-center",
+                        autoClose: 5000,
+                        theme: "dark",
+                    });
+                    throw new Error("Stored files are not valid File objects");
+                }
+                
                 toast.success("✅ Using stored File objects", {
                     position: "top-center",
                     autoClose: 2000,
@@ -349,10 +370,25 @@ export default function NewModelModal({ isOpen, onClose, gender, setGender, onTo
         
             // Add files to FormData
             console.error(`📦 Adding ${filesToUpload.length} files to FormData`);
-            filesToUpload.forEach((file, i) => {
-                console.error(`  - File ${i}: ${file.name}, ${file.size} bytes, ${file.type}`);
-                formData.append("images", file, `image_${i}.png`);
-            });
+            try {
+                for (let i = 0; i < filesToUpload.length; i++) {
+                    const file = filesToUpload[i];
+                    console.error(`  - File ${i}: ${file.name}, ${file.size} bytes, ${file.type}`);
+                    formData.append("images", file, `image_${i}.png`);
+                }
+                toast.success(`✅ ${filesToUpload.length} files added to request`, {
+                    position: "top-center",
+                    autoClose: 2000,
+                    theme: "dark",
+                });
+            } catch (appendError) {
+                toast.error(`❌ Failed to add files: ${(appendError as Error).message}`, {
+                    position: "top-center",
+                    autoClose: 5000,
+                    theme: "dark",
+                });
+                throw new Error(`Failed to append files: ${(appendError as Error).message}`);
+            }
         
             // Step 3: Send to training backend
             toast.info("🚀 Sending training request...", {

@@ -1,1 +1,1 @@
-export const APP_VERSION = '1.0.4'; // Increment this when making breaking changes 
+export const APP_VERSION = '1.0.5'; // Increment this when making breaking changes 
