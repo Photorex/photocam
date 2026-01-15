@@ -6,7 +6,7 @@
 import fs from 'fs';
 import path from 'path';
 
-const LOG_DIR = '/home/dev2/.pm2/logs/critical';
+const LOG_DIR = '/home/dev1/.pm2/logs/critical';
 const LOG_FILE = path.join(LOG_DIR, 'critical-errors.log');
 
 // Ensure log directory exists

@@ -12,8 +12,8 @@ module.exports = {
           NODE_ENV: 'production',
           PORT: 3000
         },
-        error_file: '/home/dev2/.pm2/logs/simcam-error.log',
-        out_file: '/home/dev2/.pm2/logs/simcam-out.log',
+        error_file: '/home/dev1/.pm2/logs/simcam-error.log',
+        out_file: '/home/dev1/.pm2/logs/simcam-out.log',
         log_date_format: 'YYYY-MM-DD HH:mm:ss Z',
         autorestart: true,
         watch: false,
@@ -36,8 +36,8 @@ module.exports = {
         env: {
           NODE_ENV: 'production'
         },
-        error_file: '/home/dev2/.pm2/logs/health-checker-error.log',
-        out_file: '/home/dev2/.pm2/logs/health-checker-out.log',
+        error_file: '/home/dev1/.pm2/logs/health-checker-error.log',
+        out_file: '/home/dev1/.pm2/logs/health-checker-out.log',
         log_date_format: 'YYYY-MM-DD HH:mm:ss Z',
         autorestart: true,
         watch: false,
@@ -56,8 +56,8 @@ module.exports = {
         env: {
           NODE_ENV: 'production'
         },
-        error_file: '/home/dev2/.pm2/logs/webhook-server-error.log',
-        out_file: '/home/dev2/.pm2/logs/webhook-server-out.log',
+        error_file: '/home/dev1/.pm2/logs/webhook-server-error.log',
+        out_file: '/home/dev1/.pm2/logs/webhook-server-out.log',
         log_date_format: 'YYYY-MM-DD HH:mm:ss Z',
         autorestart: true,
         watch: false,
@@ -76,8 +76,8 @@ module.exports = {
         env: {
           NODE_ENV: 'production'
         },
-        error_file: '/home/dev2/.pm2/logs/mongo-backup-error.log',
-        out_file: '/home/dev2/.pm2/logs/mongo-backup-out.log',
+        error_file: '/home/dev1/.pm2/logs/mongo-backup-error.log',
+        out_file: '/home/dev1/.pm2/logs/mongo-backup-out.log',
         log_date_format: 'YYYY-MM-DD HH:mm:ss Z',
         autorestart: true,
         watch: false,
