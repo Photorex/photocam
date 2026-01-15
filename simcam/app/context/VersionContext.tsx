@@ -65,16 +65,13 @@ export const VersionProvider = ({ children }: { children: React.ReactNode }) => 
   };
   
   const forceRefresh = () => {
-    // Clear cache
+    // Clear cache and storage
     localStorage.clear();
     sessionStorage.clear();
     
-    // Save current app state temporarily if needed
-    const currentPath = window.location.pathname;
-    sessionStorage.setItem('recovery_path', currentPath);
-    
-    // Redirect to recovery endpoint
-    window.location.href = '/api/recover';
+    // Simple hard refresh without additional redirects
+    // This clears the cache and reloads the current page
+    window.location.reload();
   };
 
   useEffect(() => {
@@ -83,16 +80,6 @@ export const VersionProvider = ({ children }: { children: React.ReactNode }) => 
     
     // Set up interval for periodic checks
     const interval = setInterval(checkVersion, VERSION_CHECK_INTERVAL);
-    
-    // Check for recovery path
-    const recoveryPath = sessionStorage.getItem('recovery_path');
-    if (recoveryPath) {
-      sessionStorage.removeItem('recovery_path');
-      // Navigate back if not on home page
-      if (recoveryPath !== '/' && window.location.pathname === '/') {
-        window.location.href = recoveryPath;
-      }
-    }
     
     return () => clearInterval(interval);
   }, []);

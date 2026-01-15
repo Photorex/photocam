@@ -48,16 +48,27 @@ export default function NewModelModal({ isOpen, onClose, gender, setGender, onTo
     const uploadInputRef = useRef<HTMLInputElement>(null);
     
 
-    const { userModelTrainImages, setUserModelTrainImages, isTrainingLoading, setIsTrainingLoading } = useControlMenuContext();
+    const { 
+        userModelTrainImages, 
+        setUserModelTrainImages, 
+        userModelTrainFiles, 
+        setUserModelTrainFiles, 
+        isTrainingLoading, 
+        setIsTrainingLoading 
+    } = useControlMenuContext();
 
     const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
         const files = Array.from(event.target.files || []);
         const fileUrls = files.map(file => URL.createObjectURL(file));
+        
+        // Store both URLs (for display) and File objects (for upload)
         setUserModelTrainImages((prev: string[]) => [...prev, ...fileUrls].slice(0, 10));
+        setUserModelTrainFiles((prev: File[]) => [...prev, ...files].slice(0, 10));
       };
       
       const removeImage = (indexToRemove: number) => {
         setUserModelTrainImages((prev: string[]) => prev.filter((_, i: number) => i !== indexToRemove));
+        setUserModelTrainFiles((prev: File[]) => prev.filter((_, i: number) => i !== indexToRemove));
       };
 
     useEffect(() => {
@@ -78,7 +89,8 @@ export default function NewModelModal({ isOpen, onClose, gender, setGender, onTo
         setPage(1);                          
         setName('');                         
         setAge('');                          
-        setUserModelTrainImages([]);         
+        setUserModelTrainImages([]);
+        setUserModelTrainFiles([]);         
         onClose();                           
     };
 
@@ -139,7 +151,7 @@ export default function NewModelModal({ isOpen, onClose, gender, setGender, onTo
             return;
         }
 
-        if (userModelTrainImages.length !== 10 || !name || !age || !session?.user?.id) {
+        if (userModelTrainFiles.length !== 10 || !name || !age || !session?.user?.id) {
             toast.error('Please fill all fields and upload exactly 10 images.', {
                 position: "top-right",
                 autoClose: 5000,
@@ -249,13 +261,10 @@ export default function NewModelModal({ isOpen, onClose, gender, setGender, onTo
             formData.append("age", age);
             formData.append("gender", genderLabel);
         
-            const files = await Promise.all(
-                userModelTrainImages.map(async (url, i) => {
-                const blob = await fetch(url).then(res => res.blob());
-                return new File([blob], `image_${i}.png`, { type: blob.type });
-                })
-            );
-            files.forEach((file) => formData.append("images", file));
+            // Use the stored File objects directly (works on both desktop and mobile)
+            userModelTrainFiles.forEach((file, i) => {
+                formData.append("images", file, `image_${i}.png`);
+            });
         
             // Step 3: Send to training backend
             const res = await fetch("/api/lora/train", {

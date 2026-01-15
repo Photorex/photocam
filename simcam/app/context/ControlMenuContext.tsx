@@ -74,6 +74,8 @@ interface ControlMenuContextType {
     setSelectedPhotoshootModelIndex: (index: number) => void;
     userModelTrainImages: string[];
     setUserModelTrainImages: React.Dispatch<React.SetStateAction<string[]>>;
+    userModelTrainFiles: File[];
+    setUserModelTrainFiles: React.Dispatch<React.SetStateAction<File[]>>;
     selectedGenderFilter: 'Male' | 'Female';
     setSelectedGenderFilter: (value: 'Male' | 'Female') => void;
     isTrainingLoading: boolean;
@@ -142,6 +144,8 @@ const defaultValues: ControlMenuContextType = {
     setSelectedPhotoshootModelIndex: () => {},
     userModelTrainImages: [],
     setUserModelTrainImages: () => {},
+    userModelTrainFiles: [],
+    setUserModelTrainFiles: () => {},
     selectedGenderFilter: 'Female',
     setSelectedGenderFilter: () => {},
     isTrainingLoading: false,
@@ -182,6 +186,7 @@ export const ControlMenuProvider = ({ children }: { children: ReactNode }) => {
     const [studioType, setStudioType] = useState<StudioType>(defaultValues.studioType);
     const [selectedPhotoshootModelIndex, setSelectedPhotoshootModelIndex] = useState<number>(0);
     const [userModelTrainImages, setUserModelTrainImages] = useState<string[]>([]);
+    const [userModelTrainFiles, setUserModelTrainFiles] = useState<File[]>([]);
     const [selectedGenderFilter, setSelectedGenderFilter] = useState<'Male' | 'Female'>('Female');
     const [isTrainingLoading, setIsTrainingLoading] = useState(defaultValues.isTrainingLoading);
     const [selectedTypeIndex, setSelectedTypeIndex] = useState(defaultValues.selectedTypeIndex);
@@ -281,6 +286,8 @@ export const ControlMenuProvider = ({ children }: { children: ReactNode }) => {
             setSelectedPhotoshootModelIndex,
             userModelTrainImages,
             setUserModelTrainImages,
+            userModelTrainFiles,
+            setUserModelTrainFiles,
             selectedGenderFilter,
             setSelectedGenderFilter,
             isTrainingLoading,

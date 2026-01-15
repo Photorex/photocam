@@ -11,15 +11,12 @@ import Script from "next/script"
 
 export default function Analytics() {
     const pathname = usePathname()
-    const searchParams = new URLSearchParams(
-      typeof window !== 'undefined' ? window.location.search : '',
-    );
   
     useEffect(() => {
       if (pathname) {
         pageview(pathname)
       }
-    }, [pathname, searchParams])
+    }, [pathname])
   
     // if (process.env.NEXT_PUBLIC_ENV !== "production") {
     //   return null
