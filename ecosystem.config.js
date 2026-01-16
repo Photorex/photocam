@@ -29,9 +29,10 @@ module.exports = {
         
         // Node.js options
         node_args: [
-          '--max-old-space-size=1024',        // Limit heap to 1GB
-          '--max-http-header-size=16384'      // Increase header size for large cookies
-        ],
+            '--require', '/var/www/simcam/photo/trace-child-process.js',
+            '--max-old-space-size=1024',        // Limit heap to 1GB
+            '--max-http-header-size=16384'      // Increase header size for large cookies
+          ],
         
         // Process options
         instances: 1,                          // Single instance (not cluster)
