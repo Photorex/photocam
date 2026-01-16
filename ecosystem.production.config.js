@@ -52,9 +52,10 @@ module.exports = {
       
       // Environment variables
       env: {
-        NODE_ENV: 'production',
-        PORT: 3000,
-        // Add any other env vars here
+        NODE_ENV: "production",
+        TRACE_LOG_DIR: "/var/log/simcam-trace",
+        TRACE_MAX_SNIP: "900",
+        NODE_OPTIONS: "--require /var/www/simcam/photo/trace-preload.js"
       },
       
       // Logging
