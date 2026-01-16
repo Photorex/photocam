@@ -30,6 +30,9 @@ MINER_PROCESSES=(
     "ccminer"
     "nanominer"
     "ethminer"
+    "x86_64"
+    ".kok"
+    "app_worker"
 )
 
 # Known miner file paths
@@ -41,6 +44,9 @@ MINER_PATHS=(
     "/tmp/systemd-private-*"
     "/dev/shm/.*"
     "/var/tmp/.*sys"
+    "/x86_64*"
+    "/*.kok"
+    "/tmp/.XIN-unix/*"
 )
 
 # Function to log messages
@@ -162,14 +168,47 @@ scan_miner_processes() {
         fi
     done
     
-    # Check for high CPU processes that might be miners
+    # Check for high CPU processes that might be miners (>20% CPU)
     log_message "${BLUE}[INFO]${NC}" "Checking for high CPU usage processes..."
-    high_cpu=$(ps aux --sort=-%cpu | head -n 6 | tail -n 5)
     
-    if echo "$high_cpu" | grep -qE "linuxsys|xmrig|miner"; then
-        log_alert "High CPU process detected that looks like a miner!"
-        echo "$high_cpu"
-    fi
+    # Get processes using more than 20% CPU (not system processes)
+    ps aux --sort=-%cpu | awk 'NR>1 && $3>20.0 && $1!="root" && $11!~/^\[/ {print $0}' | while read line; do
+        pid=$(echo "$line" | awk '{print $2}')
+        cpu=$(echo "$line" | awk '{print $3}')
+        cmd=$(echo "$line" | awk '{print $11}')
+        user=$(echo "$line" | awk '{print $1}')
+        
+        # Check if it looks suspicious
+        if echo "$cmd" | grep -qE "^/[^/]+$|x86_64|\.kok|/tmp/|/dev/shm|/var/tmp"; then
+            log_alert "SUSPICIOUS HIGH CPU PROCESS: PID=$pid CPU=${cpu}% USER=$user CMD=$cmd"
+            echo "$line"
+            found=true
+            
+            if [ "$1" = "--kill-miners" ]; then
+                log_message "${YELLOW}[ACTION]${NC}" "Killing suspicious process: PID=$pid"
+                sudo kill -9 "$pid"
+                log_message "${GREEN}[OK]${NC}" "Killed PID: $pid"
+            fi
+        fi
+    done
+    
+    # Also check for processes running from root directory or suspicious locations
+    ps aux | awk '$11 ~ /^\/[^\/]+$/ || $11 ~ /\/tmp\// || $11 ~ /\/dev\/shm/' | grep -v "^\[" | while read line; do
+        pid=$(echo "$line" | awk '{print $2}')
+        cmd=$(echo "$line" | awk '{print $11}')
+        
+        if [ ! -z "$pid" ] && [ "$pid" != "PID" ]; then
+            log_alert "Process running from suspicious location: PID=$pid CMD=$cmd"
+            echo "$line"
+            found=true
+            
+            if [ "$1" = "--kill-miners" ]; then
+                log_message "${YELLOW}[ACTION]${NC}" "Killing process from suspicious location: PID=$pid"
+                sudo kill -9 "$pid"
+                log_message "${GREEN}[OK]${NC}" "Killed PID: $pid"
+            fi
+        fi
+    done
     
     if [ "$found" = false ]; then
         log_message "${GREEN}[OK]${NC}" "No known miner processes detected"
