@@ -14,15 +14,15 @@ module.exports = {
   apps: [
     {
       // SIMCAM - Next.js Application (Port 3000)
+      // Uses start-wrapper.js to handle SIGPIPE and prevent crashes
       name: 'simcam',
       cwd: '/var/www/simcam/photo/simcam',
-      script: 'npm',
-      args: 'start',
+      script: 'start-wrapper.js',
+      node_args: '--max-old-space-size=512',
       
       env: {
         NODE_ENV: 'production',
         PORT: 3000,
-        NODE_OPTIONS: '--max-old-space-size=512'  // Reduced from 768 to 512MB
       },
       
       autorestart: true,                    // Always restart on crash
