@@ -26,6 +26,7 @@ module.exports = {
       },
       
       autorestart: true,                    // Always restart on crash
+      kill_timeout: 5000,                   // Force kill after 5s if not graceful
       
       error_file: '/home/dev1/.pm2/logs/simcam-error.log',
       out_file: '/home/dev1/.pm2/logs/simcam-out.log',

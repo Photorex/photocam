@@ -300,6 +300,92 @@ function checkHealth() {
   }
 }
 
+// Function to detect and kill zombie Next.js processes
+function checkForZombies() {
+  exec("ps aux | grep -E 'next|node.*simcam' | grep -v 'grep\\|PM2\\|health'", (error, stdout) => {
+    if (error) return;
+    
+    const lines = stdout.trim().split('\n').filter(line => line && line.length > 0);
+    
+    if (lines.length === 0) return;
+    
+    // Get PM2 simcam process info
+    exec("pm2 jlist", (pmError, pmOut) => {
+      if (pmError) {
+        logCritical("ERROR", "Failed to get PM2 process list for zombie check", {
+          error: pmError.message,
+        });
+        return;
+      }
+      
+      try {
+        const pmProcesses = JSON.parse(pmOut);
+        const simcamProcess = pmProcesses.find(p => p.name === 'simcam');
+        
+        if (!simcamProcess) {
+          logCritical("WARN", "simcam not found in PM2 during zombie check");
+          return;
+        }
+        
+        const legitPID = simcamProcess.pid;
+        const zombies = [];
+        
+        lines.forEach(line => {
+          const parts = line.trim().split(/\s+/);
+          const pid = parts[1];
+          const cpu = parseFloat(parts[2]);
+          const mem = parseFloat(parts[3]);
+          const command = parts.slice(10).join(' ');
+          
+          // If not the PM2-managed process
+          if (parseInt(pid) !== legitPID) {
+            zombies.push({ pid, cpu, mem, command });
+            
+            // Kill if using significant resources
+            if (cpu > 50 || mem > 10) {
+              logCritical("CRITICAL", "🧟 ZOMBIE PROCESS DETECTED - KILLING!", {
+                pid,
+                cpu: `${cpu}%`,
+                mem: `${mem}%`,
+                command: command.substring(0, 100),
+                legitPID,
+              });
+              
+              exec(`kill -9 ${pid}`, (killErr, killOut, killStderr) => {
+                if (killErr) {
+                  logCritical("ERROR", "Failed to kill zombie process", {
+                    pid,
+                    error: killErr.message,
+                    stderr: killStderr,
+                  });
+                } else {
+                  logCritical("INFO", "✅ Zombie process killed successfully", {
+                    pid,
+                    cpu: `${cpu}%`,
+                    mem: `${mem}%`,
+                  });
+                }
+              });
+            }
+          }
+        });
+        
+        if (zombies.length > 0) {
+          logCritical("WARN", "Zombie processes found", {
+            count: zombies.length,
+            zombies: zombies.map(z => `PID:${z.pid} CPU:${z.cpu}% MEM:${z.mem}%`),
+            legitPID,
+          });
+        }
+      } catch (parseError) {
+        logCritical("ERROR", "Failed to parse PM2 process list", {
+          error: parseError.message,
+        });
+      }
+    });
+  });
+}
+
 // Start the health checker after initial delay
 logCritical("INFO", `Health checker started. Waiting ${INITIAL_DELAY}ms before first check...`);
 setTimeout(() => {
@@ -310,6 +396,11 @@ setTimeout(() => {
   
   // Then run on interval
   setInterval(checkHealth, CHECK_INTERVAL);
+  
+  // Start zombie detection (check every 60 seconds)
+  logCritical("INFO", `Starting zombie process detection every 60s...`);
+  checkForZombies();  // Run first check immediately
+  setInterval(checkForZombies, 60000);
 }, INITIAL_DELAY);
 
 // Global error handlers
