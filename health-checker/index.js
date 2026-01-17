@@ -341,8 +341,8 @@ function checkForZombies() {
           if (parseInt(pid) !== legitPID) {
             zombies.push({ pid, cpu, mem, command });
             
-            // Kill if using significant resources
-            if (cpu > 50 || mem > 10) {
+            // Kill if using any significant resources (lowered threshold)
+            if (cpu > 5 || mem > 1) {
               logCritical("CRITICAL", "🧟 ZOMBIE PROCESS DETECTED - KILLING!", {
                 pid,
                 cpu: `${cpu}%`,

@@ -22,11 +22,12 @@ module.exports = {
       env: {
         NODE_ENV: 'production',
         PORT: 3000,
-        NODE_OPTIONS: '--max-old-space-size=768'
+        NODE_OPTIONS: '--max-old-space-size=512'  // Reduced from 768 to 512MB
       },
       
       autorestart: true,                    // Always restart on crash
       kill_timeout: 5000,                   // Force kill after 5s if not graceful
+      max_memory_restart: '600M',           // Safety valve: restart before crash
       
       error_file: '/home/dev1/.pm2/logs/simcam-error.log',
       out_file: '/home/dev1/.pm2/logs/simcam-out.log',

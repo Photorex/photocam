@@ -3,6 +3,17 @@ const nextConfig = {
     generateBuildId: async () => {
         return `build-${Date.now()}`;
     },
+    images: {
+        // Limit image optimization cache to prevent memory leaks
+        minimumCacheTTL: 60,              // Cache for 60 seconds only
+        deviceSizes: [640, 750, 828, 1080, 1200], // Reduce device sizes
+        imageSizes: [16, 32, 48, 64, 96, 128, 256, 384], // Reduce image sizes
+        formats: ['image/webp'],          // Only WebP, no AVIF (saves memory)
+        dangerouslyAllowSVG: true,
+        contentDispositionType: 'inline',
+        // Limit concurrent optimizations
+        unoptimized: false,
+    },
     async rewrites() {
         return [
           {
