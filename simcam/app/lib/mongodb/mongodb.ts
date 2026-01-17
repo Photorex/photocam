@@ -44,8 +44,8 @@ export async function connectMongoDB() {
   
   if (!cached.promise) {
     logger.info('MONGODB', 'Creating new MongoDB connection', {
-      maxPoolSize: 100,
-      minPoolSize: 10,
+      maxPoolSize: 10,
+      minPoolSize: 2,
       heartbeatFrequency: '10s',
     });
 

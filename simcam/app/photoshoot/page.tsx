@@ -48,6 +48,7 @@ import styles from "./page.module.css";
 import { useWindowSize } from "@/app/lib/hooks/useWindowSize";
 
 import { fetchUserImages, ImageMetadata } from "../lib/api/fetchUserImages";
+import { MemoryTracker } from '@/app/lib/memoryTracker';
 import { VideoMetadata } from "../lib/api/fetchUserVideos";
 
 // Import icons
@@ -346,9 +347,23 @@ export default function Photoshoot() {
     };
 
     useEffect(() => {
+        MemoryTracker.track('photoshoot-merge-start');
+        
         const merged = mergeMedia(images, videos);
+        console.log(`[PHOTOSHOOT] Merging media:`, {
+            imagesCount: images.length,
+            videosCount: videos.length,
+            mergedCount: merged.length,
+            imagesSize: JSON.stringify(images).length,
+            videosSize: JSON.stringify(videos).length,
+            timestamp: new Date().toISOString(),
+        });
+        
         setMedia(merged);
         setColumns(splitIntoColumns(merged));
+        
+        MemoryTracker.track('photoshoot-merge-end');
+        MemoryTracker.compare('photoshoot-merge-start', 'photoshoot-merge-end');
     }, [images, videos]);
 
     // useEffect(() => {
@@ -440,22 +455,43 @@ export default function Photoshoot() {
         // console.log('media useEffect 3');
         if (!shouldRefetch) return;
       
+        console.log('[PHOTOSHOOT] Starting polling for pending media');
+        MemoryTracker.track('polling-start');
+      
         const interval = setInterval(async () => {
+            MemoryTracker.track('poll-tick-start');
+            console.log('[PHOTOSHOOT] Polling tick - checking for updates');
+            
             const [imgs, vids] = await Promise.all([
                 refetchImages(),
                 refetchVideos()
             ]);
+            
+            console.log('[PHOTOSHOOT] Poll results:', {
+                imagesCount: imgs.length,
+                videosCount: vids.length,
+                generatingImages: imgs.filter(img => img.status === 'generating').length,
+                generatingVideos: vids.filter(vid => vid.status === 'generating').length,
+            });
+            
             const stillGenerating = imgs.some(i => i.status === 'generating') ||
                                 vids.some(v => v.status === 'generating');
+            
+            MemoryTracker.track('poll-tick-end');
+            MemoryTracker.compare('poll-tick-start', 'poll-tick-end');
       
           if (!stillGenerating) {
+            console.log('[PHOTOSHOOT] No more generating media, stopping poll');
             clearInterval(interval);
             setShouldRefetch(false);
             eventBus.dispatchEvent(new Event("generation-finish"));
           }
         }, 10000);
       
-        return () => clearInterval(interval);
+        return () => {
+            console.log('[PHOTOSHOOT] Cleaning up polling interval');
+            clearInterval(interval);
+        };
     }, [shouldRefetch, refetchImages, refetchVideos]);
       
     // useEffect(() => {

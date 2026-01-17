@@ -70,6 +70,12 @@ export const UserImagesProvider = ({ children }: { children: ReactNode }) => {
   const refetchImages = useCallback(async () => {
     if (!session?.user?.id) return [];
 
+    console.log('[CONTEXT:IMAGES] Refetching images', {
+      currentCount: images.length,
+      currentPage: page,
+      timestamp: new Date().toISOString(),
+    });
+
     setLoading(true);
     try {
       const refreshed = await fetchUserImages(
@@ -78,15 +84,23 @@ export const UserImagesProvider = ({ children }: { children: ReactNode }) => {
         (page + 1) * IMAGES_PER_PAGE
       );
       const unique = uniqueById(refreshed);
+      
+      console.log('[CONTEXT:IMAGES] Images refetched:', {
+        fetched: refreshed.length,
+        afterDedupe: unique.length,
+        duplicatesRemoved: refreshed.length - unique.length,
+        arraySize: JSON.stringify(unique).length,
+      });
+      
       setImages(unique);
       return unique;
     } catch (err) {
-      // Silently handle - not an error if user has no images
+      console.error('[CONTEXT:IMAGES] Error refetching images:', err);
       return [];
     } finally {
       setLoading(false);
     }
-  }, [session?.user?.id, page]);
+  }, [session?.user?.id, page, images.length]);
 
   /* --- helpers -------------------------------------------------------- */
   const resetImages = () => {

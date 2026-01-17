@@ -71,6 +71,12 @@ export const UserVideosProvider = ({ children }: { children: ReactNode }) => {
   const refetchVideos = useCallback(async () => {
     if (!session?.user?.id) return [];
 
+    console.log('[CONTEXT:VIDEOS] Refetching videos', {
+      currentCount: videos.length,
+      currentPage: page,
+      timestamp: new Date().toISOString(),
+    });
+
     setLoading(true);
     try {
       const refreshed = await fetchUserVideos(
@@ -79,15 +85,23 @@ export const UserVideosProvider = ({ children }: { children: ReactNode }) => {
         (page + 1) * PAGE_SIZE
       );
       const unique = uniqueById(refreshed);
+      
+      console.log('[CONTEXT:VIDEOS] Videos refetched:', {
+        fetched: refreshed.length,
+        afterDedupe: unique.length,
+        duplicatesRemoved: refreshed.length - unique.length,
+        arraySize: JSON.stringify(unique).length,
+      });
+      
       setVideos(unique);
       return unique;
     } catch (err) {
-      // Silently handle - not an error if user has no videos
+      console.error('[CONTEXT:VIDEOS] Error refetching videos:', err);
       return [];
     } finally {
       setLoading(false);
     }
-  }, [session?.user?.id, page]);
+  }, [session?.user?.id, page, videos.length]);
 
   /* -- helpers -------------------------------------------------------- */
   const resetVideos = () => {
