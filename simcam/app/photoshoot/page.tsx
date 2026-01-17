@@ -347,18 +347,8 @@ export default function Photoshoot() {
 
     useEffect(() => {
         const merged = mergeMedia(images, videos);
-        setMedia(prevMedia => {
-            // BEFORE (BAD):
-            // if (JSON.stringify(prevMedia) !== JSON.stringify(merged)) {
-            
-            // AFTER (GOOD):
-            if (prevMedia.length !== merged.length || 
-                !merged.every((item, idx) => item._id === prevMedia[idx]?._id)) {
-                setColumns(splitIntoColumns(merged));
-                return merged;
-            }
-            return prevMedia;
-        });
+        setMedia(merged);
+        setColumns(splitIntoColumns(merged));
     }, [images, videos]);
 
     // useEffect(() => {
