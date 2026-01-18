@@ -114,6 +114,13 @@ const nextConfig = {
       },
     },
   },
+  
+  // API route body size limit (for formData uploads in /api/lora/train)
+  api: {
+    bodyParser: {
+      sizeLimit: '50mb',
+    },
+  },
   };
   
   module.exports = nextConfig;
