@@ -99,18 +99,21 @@ const nextConfig = {
       return config;
     },
   
-    experimental: {
-      turbo: {
-        rules: {
-          // Let Turbopack use SVGR, but avoid icon.svg
-          "*.svg": {
-            loaders: ["@svgr/webpack"],
-            as: "*.js",
-            exclude: ["app/icon.svg"], // ❗ exclude app/icon.svg
-          },
+  experimental: {
+    serverActions: {
+      bodySizeLimit: '50mb', // Allow up to 50MB for LoRA training photo uploads
+    },
+    turbo: {
+      rules: {
+        // Let Turbopack use SVGR, but avoid icon.svg
+        "*.svg": {
+          loaders: ["@svgr/webpack"],
+          as: "*.js",
+          exclude: ["app/icon.svg"], // ❗ exclude app/icon.svg
         },
       },
     },
+  },
   };
   
   module.exports = nextConfig;
