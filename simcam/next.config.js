@@ -103,6 +103,7 @@ const nextConfig = {
     serverActions: {
       bodySizeLimit: '50mb', // Allow up to 50MB for LoRA training photo uploads
     },
+    proxyClientMaxBodySize: '60mb',
     turbo: {
       rules: {
         // Let Turbopack use SVGR, but avoid icon.svg
