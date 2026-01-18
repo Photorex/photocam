@@ -4,10 +4,6 @@ import User from "@/app/lib/mongodb/models/user";
 import { trainLoraModel } from "@/app/lib/lora/trainLoraModel";
 import { validateImageFiles, sanitizeId, sanitizeString } from "@/app/lib/security/fileValidation";
 
-// Configure route to allow larger request bodies (for training image uploads)
-export const dynamic = 'force-dynamic';
-export const maxDuration = 60; // 60 seconds timeout
-
 // const LIMITS = {
 //     Free:   0,
 //     Muse:   1,
