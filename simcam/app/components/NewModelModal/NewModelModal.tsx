@@ -630,30 +630,46 @@ export default function NewModelModal({ isOpen, onClose, gender, setGender, onTo
                         )}
                         
                         <div className={styles.uploadButtonWrapper}>
-                        {userModelTrainImages.length === 10 && (
-                            <button
-                                className={styles.uploadButton}
-                                disabled={totalImageSize > 10 * 1024 * 1024}
-                                style={{
-                                    opacity: totalImageSize > 10 * 1024 * 1024 ? 0.5 : 1,
-                                    cursor: totalImageSize > 10 * 1024 * 1024 ? 'not-allowed' : 'pointer'
-                                }}
-                                onClick={async () => {
-                                    try {
-                                        if (session?.user) {
-                                            trackGtmEvent("train_model", {
-                                            ecommerce: { usid: session.user.id }
-                                            });
+                            {/* Show warning if 10 images but size exceeds 10MB */}
+                            {userModelTrainImages.length === 10 && totalImageSize > 10 * 1024 * 1024 && (
+                                <div style={{
+                                    padding: '12px 16px',
+                                    backgroundColor: '#ff4444',
+                                    color: 'white',
+                                    borderRadius: '8px',
+                                    marginBottom: '12px',
+                                    textAlign: 'center',
+                                    fontSize: '14px',
+                                    fontWeight: '500'
+                                }}>
+                                    ⚠️ Images too large ({(totalImageSize / (1024 * 1024)).toFixed(1)} MB). Max 10 MB total.
+                                </div>
+                            )}
+                            
+                            {userModelTrainImages.length === 10 && (
+                                <button
+                                    className={styles.uploadButton}
+                                    disabled={totalImageSize > 10 * 1024 * 1024}
+                                    style={{
+                                        opacity: totalImageSize > 10 * 1024 * 1024 ? 0.5 : 1,
+                                        cursor: totalImageSize > 10 * 1024 * 1024 ? 'not-allowed' : 'pointer'
+                                    }}
+                                    onClick={async () => {
+                                        try {
+                                            if (session?.user) {
+                                                trackGtmEvent("train_model", {
+                                                ecommerce: { usid: session.user.id }
+                                                });
+                                            }
+                                            await handleTrainModel();
+                                        } catch (error) {
+                                            console.error("🚨 Button click error:", error);
                                         }
-                                        await handleTrainModel();
-                                    } catch (error) {
-                                        console.error("🚨 Button click error:", error);
-                                    }
-                                }}
-                            >
-                                Train model
-                            </button>
-                        )}
+                                    }}
+                                >
+                                    Train model
+                                </button>
+                            )}
                         </div>
                     </div>
                 )}
