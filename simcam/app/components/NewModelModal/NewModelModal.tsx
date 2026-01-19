@@ -47,7 +47,6 @@ export default function NewModelModal({ isOpen, onClose, gender, setGender, onTo
     const dropdownRef = useRef<HTMLDivElement>(null);
     const uploadInputRef = useRef<HTMLInputElement>(null);
     const [totalImageSize, setTotalImageSize] = useState<number>(0); // in bytes
-    
 
     const { 
         userModelTrainImages, 
@@ -76,7 +75,6 @@ export default function NewModelModal({ isOpen, onClose, gender, setGender, onTo
         setUserModelTrainImages((prev: string[]) => prev.filter((_, i: number) => i !== indexToRemove));
         setUserModelTrainFiles((prev: File[]) => {
             const newFiles = prev.filter((_, i: number) => i !== indexToRemove);
-            // Recalculate total size
             const newTotalSize = newFiles.reduce((sum, file) => sum + file.size, 0);
             setTotalImageSize(newTotalSize);
             return newFiles;
@@ -103,7 +101,7 @@ export default function NewModelModal({ isOpen, onClose, gender, setGender, onTo
         setAge('');                          
         setUserModelTrainImages([]);
         setUserModelTrainFiles([]);
-        setTotalImageSize(0); // Add this line
+        setTotalImageSize(0);
         onClose();                           
     };
 
@@ -525,10 +523,18 @@ export default function NewModelModal({ isOpen, onClose, gender, setGender, onTo
 
                             {userModelTrainImages.length < 10 && (
                                 <>
-                                    {userModelTrainImages.length > 0 && (
-                                        <div className={styles.imageCounter}>
-                                            {userModelTrainImages.length}/<span className={styles.gradientText}>10</span>
-                                        </div>
+                                    {userModelTrainImages.length < 10 && userModelTrainImages.length > 0 && (
+                                        <>
+                                            {totalImageSize > 10 * 1024 * 1024 ? (
+                                                <div className={styles.imageCounter} style={{ color: '#ff4444', fontSize: '14px' }}>
+                                                    ⚠️ Images too large ({(totalImageSize / (1024 * 1024)).toFixed(1)} MB). Max 10 MB total.
+                                                </div>
+                                            ) : (
+                                                <div className={styles.imageCounter}>
+                                                    {userModelTrainImages.length}/<span className={styles.gradientText}>10</span>
+                                                </div>
+                                            )}
+                                        </>
                                     )}
                                 
                                     <div className={styles.uploadBox} onClick={() => document.getElementById("uploadInput")?.click()}>
@@ -549,47 +555,6 @@ export default function NewModelModal({ isOpen, onClose, gender, setGender, onTo
                                             <div className={styles.dragText}>Or drag and drop your photos</div>
                                         </div>
                                     </div>
-
-                                    {userModelTrainImages.length > 0 && (
-                                        <>
-                                            <div className={styles.uploadedImagesList}>
-                                                {userModelTrainImages.map((src, index) => (
-                                                <div key={index} className={styles.uploadedImageRow}>
-                                                    <div className={styles.uploadedImagePreview}>
-                                                        <Image src={src} alt={`Uploaded ${index}`} width={40} height={40} />
-                                                    </div>
-                                                    <button
-                                                        className={styles.deleteButton}
-                                                        onClick={() => removeImage(index)}
-                                                    >
-                                                    <DeleteIcon className={styles.image_options_delete_button}  />
-                                                    </button>
-                                                </div>
-                                                ))}
-                                            </div>
-                                            
-                                            {/* Size warning - show when all 10 images uploaded but size > 10MB */}
-                                            {userModelTrainImages.length === 10 && totalImageSize > 10 * 1024 * 1024 && (
-                                                <div style={{
-                                                    padding: '14px 16px',
-                                                    backgroundColor: '#ff4444',
-                                                    color: 'white',
-                                                    borderRadius: '12px',
-                                                    marginTop: '16px',
-                                                    marginBottom: '8px',
-                                                    textAlign: 'center',
-                                                    fontSize: '14px',
-                                                    lineHeight: '1.5',
-                                                    fontWeight: '500'
-                                                }}>
-                                                    ⚠️ Images are too large ({(totalImageSize / (1024 * 1024)).toFixed(1)} MB).
-                                                    <br />
-                                                    Please use smaller images (max 10 MB total) or compress them before uploading.
-                                                </div>
-                                            )}
-                                        </>
-                                    )}
-
                                     </>
                                 )}
                         </div>
@@ -665,40 +630,30 @@ export default function NewModelModal({ isOpen, onClose, gender, setGender, onTo
                         )}
                         
                         <div className={styles.uploadButtonWrapper}>
-                            {userModelTrainImages.length === 10 && (
-                                <button
-                                    className={styles.uploadButton}
-                                    disabled={totalImageSize > 10 * 1024 * 1024}
-                                    style={{
-                                        opacity: totalImageSize > 10 * 1024 * 1024 ? 0.6 : 1,
-                                        cursor: totalImageSize > 10 * 1024 * 1024 ? 'not-allowed' : 'pointer',
-                                        backgroundColor: totalImageSize > 10 * 1024 * 1024 ? '#666' : undefined
-                                    }}
-                                    onClick={async () => {
-                                        if (totalImageSize > 10 * 1024 * 1024) {
-                                            toast.error('Please reduce image file sizes before training.', {
-                                                position: "top-center",
-                                                autoClose: 3000,
-                                                theme: "dark",
+                        {userModelTrainImages.length === 10 && (
+                            <button
+                                className={styles.uploadButton}
+                                disabled={totalImageSize > 10 * 1024 * 1024}
+                                style={{
+                                    opacity: totalImageSize > 10 * 1024 * 1024 ? 0.5 : 1,
+                                    cursor: totalImageSize > 10 * 1024 * 1024 ? 'not-allowed' : 'pointer'
+                                }}
+                                onClick={async () => {
+                                    try {
+                                        if (session?.user) {
+                                            trackGtmEvent("train_model", {
+                                            ecommerce: { usid: session.user.id }
                                             });
-                                            return;
                                         }
-                                        
-                                        try {
-                                            if (session?.user) {
-                                                trackGtmEvent("train_model", {
-                                                ecommerce: { usid: session.user.id }
-                                                });
-                                            }
-                                            await handleTrainModel();
-                                        } catch (error) {
-                                            console.error("🚨 Button click error:", error);
-                                        }
-                                    }}
-                                >
-                                    Train model
-                                </button>
-                            )}
+                                        await handleTrainModel();
+                                    } catch (error) {
+                                        console.error("🚨 Button click error:", error);
+                                    }
+                                }}
+                            >
+                                Train model
+                            </button>
+                        )}
                         </div>
                     </div>
                 )}
